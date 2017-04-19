@@ -6,13 +6,13 @@
          "name":"DevOps",
          "managedRuntimeVersion":"v4.0",
          "idleTimeoutAction":"Terminate",
-         "cpuLimit":"25000",
+         "cpuLimit":25000,
          "cpuAction":"ThrottleUnderLoad",
          "cpuResetInterval":"00:05:00",
          "restartTimeLimit":"00:00:00",
-         "restartRequestsLimit":"0",
-         "enable32BitAppOnWin64":"false",
-         "autoStart":"true",
+         "restartRequestsLimit":0,
+         "enable32BitAppOnWin64":false,
+         "autoStart":true,
          "ensure":"Present"
       }
    ]
