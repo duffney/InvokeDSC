@@ -24,3 +24,15 @@ Allows you to declaratively define your infrastructure within JSON configuration
    ]
 }
 ```
+
+### ConvertTo-DSC PSCustomObject
+
+```PowerShell
+$Resource = ConvertTo-DSC -Path 'C:\DSC\NewFile.json'
+```
+
+### Invoke-DSC
+
+```PowerShell
+Invoke-DSC -Resource $Resource -Verbose
+```
