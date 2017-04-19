@@ -1,0 +1,31 @@
+{
+   "DSCResourcesToExecute":[
+      {
+         "resourceName":"Paylocity",
+         "dscResourceName":"File",
+         "DestinationPath":"c:\\Paylocity\\DevOps",
+         "Type":"Directory",
+         "ensure":"Present"
+      },
+      {
+          "resourceName":"DevOpsApp",
+          "dscResourceName":"xWebApplication",
+          "name":"DevOps",
+          "PhysicalPath":"C:\\Paylocity\\DevOps",
+          "WebAppPool":"DefaultAppPool",
+          "WebSite":"Default Web Site",
+          "PreloadEnabled":true,
+          "EnabledProtocols":["http"],
+          "Ensure":"Present",
+          "AuthenticationInfo":[
+                {
+                    "CimType":"MSFT_xWebApplicationAuthenticationInformation",
+                    "Properties":{
+                        "Anonymous":true,
+                        "Basic":true
+                    }
+                }
+           ]
+      }
+   ]
+}

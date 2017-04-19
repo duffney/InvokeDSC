@@ -1,0 +1,18 @@
+{
+   "DSCResourcesToExecute":[
+      {
+         "resourceName":"Paylocity",
+         "dscResourceName":"File",
+         "DestinationPath":"c:\\Paylocity",
+         "Type":"Directory",
+         "ensure":"Present"
+      },
+      {
+         "resourceName":"PaylocityTemp",
+         "dscResourceName":"File",
+         "DestinationPath":"c:\\Paylocity\\Service",
+         "Type":"Directory",
+         "ensure":"Present"
+      }
+   ]
+}

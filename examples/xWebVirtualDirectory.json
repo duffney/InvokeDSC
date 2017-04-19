@@ -1,0 +1,13 @@
+{
+   "DSCResourcesToExecute":[
+      {
+          "resourceName":"ServicesVirtualDirectory",
+          "dscResourceName":"xWebVirtualDirectory",
+          "PhysicalPath":"C:\\Paylocity\\Service",
+          "name":"Service",
+          "WebSite":"Default Web Site",
+          "WebApplication":"",
+          "Ensure":"Present"
+      }
+   ]
+}
