@@ -86,5 +86,3 @@ function Invoke-DSCParse {
     end {
     }
 }
-
-Invoke-DSCParse -Path C:\temp\file5.json
