@@ -1,6 +1,7 @@
 install:
   - cinst pester
   - cinst seek-dsc-webadministration
+  - ps: Install-Module xWebAdministration
 
 build: false
 
