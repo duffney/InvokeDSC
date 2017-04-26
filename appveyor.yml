@@ -1,6 +1,6 @@
 install:
   - cinst pester
-  - cinst xwebadministration
+  - cinst dsc.webadministration
 
 build: false
 
