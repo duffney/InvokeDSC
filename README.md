@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/0ybs7owjkn14ro35?svg=true)](https://ci.appveyor.com/project/Duffney/invokedsc)
+
 # InvokeDSC
 InvokeDSC is a JSON based DSL for creating and managing infrastructure with DSC resources.
 
