@@ -1,10 +1,6 @@
-$ModuleManifestName = 'InvokeDSC.psd1'
-$ModuleManifestPath = "$PSScriptRoot\..\$ModuleManifestName"
-
 Describe 'Module Manifest Tests' {
     It 'Passes Test-ModuleManifest' {
-        Test-ModuleManifest -Path $ModuleManifestPath
+        Test-ModuleManifest -Path "$PSScriptRoot\..\..\InvokeDSC\$ModuleManifestName"
         $? | Should Be $true
     }
 }
-
