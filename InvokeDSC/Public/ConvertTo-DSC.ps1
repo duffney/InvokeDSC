@@ -104,4 +104,4 @@ function ConvertTo-DSC {
 
 #$test = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\xwebsite.json
 
-$test = ConvertTo-DSC -InputObject (Get-Content $PSScriptRoot\..\..\examples\xwebsite.json)
+#$test = ConvertTo-DSC -InputObject (Get-Content $PSScriptRoot\..\..\examples\xwebsite.json)
