@@ -6,6 +6,21 @@ Describe "Function Loaded" {
         (Get-Command -Name ConvertTo-DSC) | should not beNullorEmpty
     }
 
+    Context "Parameter Tests" {
+        
+        $result = ConvertTo-DSC -InputObject (Get-Content -Path $PSScriptRoot\..\..\examples\xWebSite.json)
+
+        It "InputObject results should not BeNullorEmpty" {
+            $result | Should not beNullorEmpty
+        }
+
+        $result = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\xWebSite.json
+
+        It "Path results should not BeNullorEmpty" {
+            $result | should not be beNullorEmpty
+        }
+    }
+
     Context "File Resource Test" {
 
         $result = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\NewFile.json

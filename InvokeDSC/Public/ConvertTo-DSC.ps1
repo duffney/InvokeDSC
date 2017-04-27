@@ -6,17 +6,29 @@ function ConvertTo-DSC {
     Converts json DSL files to PSCustomObjects that Invoke-DSCResource can consume. All property
     objects will be converted to hashtables for the property cmdlet of Invoke-DSCResource. ModuleName
     is discovered dynamically  from the resource name provided in the json.
+.PARAMETER Path
+    Specifies the path to a .json file.
+.PARAMETER InputObject
+    Specifies an InputObject containing json synatx
 .EXAMPLE
     ConvertTo-DSC -Path 'c:\json\example.json'
 #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]$Path
+        [Parameter(Mandatory=$true,ParameterSetName='Path',Position=0)]
+        [string]$Path,
+        [Parameter(Mandatory=$true,ParameterSetName='InputObject',Position=0)]
+        [object[]]$InputObject
     )
 
     begin {
-        $data = Get-Content -Path $path | ConvertFrom-Json
+        
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            $data = Get-Content -Path $path -Raw | ConvertFrom-Json
+        } else {
+            $data = $InputObject | ConvertFrom-Json
+        }
+        
         $alldscObj = @()
     }
 
@@ -90,4 +102,6 @@ function ConvertTo-DSC {
     }
 }
 
-#$test = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\AppProvisioning.json
+#$test = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\xwebsite.json
+
+$test = ConvertTo-DSC -InputObject (Get-Content $PSScriptRoot\..\..\examples\xwebsite.json)
