@@ -16,7 +16,7 @@ Allows you to declaratively define your infrastructure within JSON configuration
       {
           "resourceName":"NewFile",
           "dscResourceName":"File",
-          "destinationPath":"c:\\Paylocity\\Service\\file.txt",
+          "destinationPath":"c:\\DevOps\\Service\\file.txt",
           "type":"File",
           "contents":"Test",
           "attributes":["hidden","archive"],
