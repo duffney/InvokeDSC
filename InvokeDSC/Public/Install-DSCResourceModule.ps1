@@ -16,7 +16,7 @@ function Install-DSCResourceModule {
         [Parameter(Mandatory=$false)]
         [string]$Version,
         [Parameter(Mandatory=$false)]
-        [string]$Repository        
+        [string]$Repository
     )
     
     begin {

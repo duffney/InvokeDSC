@@ -12,11 +12,20 @@ function Get-DSCResourceModule {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [string]$Path
+        [string]$Path,
+        [switch]$Recurse
+
     )
     
     begin {
-        $data = Get-Content -Path $path -Raw | ConvertFrom-Json
+        if (!($Recurse))
+        {
+            $data = Get-Content -Path $Path -Raw | ConvertFrom-Json
+        }
+        else
+        {
+            $data = Get-ChildItem -Path $Path -Recurse | Get-Content -Raw  | ConvertFrom-Json
+        }
     }
     
     process {
