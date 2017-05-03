@@ -1,0 +1,46 @@
+{
+  "Id": "ActionTemplates-21",
+  "Name": "InvokeDSCAppConfig",
+  "Description": "Converts targeted json file to PSCustomObjects and invokes them with InvokeDSC module.",
+  "ActionType": "Octopus.Script",
+  "Version": 2,
+  "CommunityActionTemplateId": null,
+  "Properties": {
+    "Octopus.Action.Script.Syntax": "PowerShell",
+    "Octopus.Action.Script.ScriptSource": "Inline",
+    "Octopus.Action.RunOnServer": "false",
+    "Octopus.Action.Script.ScriptBody": "Import-Module InvokeDSC\r\n$Path = '#{Path}'\r\n$ConfigFileName = '#{ConfigFileName}'\r\n$FullPath = $Path+'\\'+$ConfigFileName\r\n\r\nif (!(Test-Path -Path $Path))\r\n{\r\n    Write-Output \"AppConfig not found for [$ConfigFileName]\"\r\n} \r\nelse \r\n{\r\n    Write-Output \"Configuration found [$appConfigFileName]\"\r\n    $resourceObj = ConvertTo-DSC -Path $FullPath\r\n    Write-Output \"Invoking DSC [$($resourceObj.resourceName)]\"\r\n    Invoke-DSC -resource $resourceObj\r\n}",
+    "Octopus.Action.Script.ScriptFileName": null,
+    "Octopus.Action.Package.FeedId": null,
+    "Octopus.Action.Package.PackageId": null
+  },
+  "Parameters": [
+    {
+      "Id": "7be6811a-ef3d-42dd-a766-3dd7fea54dc7",
+      "Name": "Path",
+      "Label": "",
+      "HelpText": null,
+      "DefaultValue": "",
+      "DisplaySettings": {
+        "Octopus.ControlType": "SingleLineText"
+      },
+      "Links": {}
+    },
+    {
+      "Id": "4ca879ae-6d8c-4294-9c74-61d696ee59f1",
+      "Name": "ConfigFileName",
+      "Label": "",
+      "HelpText": null,
+      "DefaultValue": "",
+      "DisplaySettings": {
+        "Octopus.ControlType": "SingleLineText"
+      },
+      "Links": {}
+    }
+  ],
+  "$Meta": {
+    "ExportedAt": "2017-05-02T17:32:53.730Z",
+    "OctopusVersion": "3.12.8",
+    "Type": "ActionTemplate"
+  }
+}
