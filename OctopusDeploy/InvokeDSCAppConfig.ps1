@@ -7,7 +7,7 @@ if (!(Test-Path -Path $Path))
 {
     Write-Output "AppConfig not found for [$ConfigFileName]"
 } 
-else 
+else
 {
     Write-Output "Configuration found [$appConfigFileName]"
     $resourceObj = ConvertTo-DSC -Path $FullPath

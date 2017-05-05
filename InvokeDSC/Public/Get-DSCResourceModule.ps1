@@ -24,7 +24,7 @@ function Get-DSCResourceModule {
         }
         else
         {
-            $data = Get-ChildItem -Path $Path -Recurse | Get-Content -Raw  | ConvertFrom-Json
+            $data = Get-ChildItem -Path $Path -Recurse -File | Get-Content -Raw  | ConvertFrom-Json
         }
     }
     
