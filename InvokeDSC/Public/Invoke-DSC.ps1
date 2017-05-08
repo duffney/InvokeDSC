@@ -24,7 +24,7 @@ function Invoke-DSC
                 }
                 
                 Write-Output "[Start Test] [[$($resource.dscResourceName)]$($resource.ResourceName)]"
-                $testResults = Invoke-DscResource @splat -Method Test -ErrorVariable TestError -Verbose:$false | Out-Null
+                $testResults = Invoke-DscResource @splat -Method Test -ErrorVariable TestError -Verbose:$false
 
                 if ($TestError) {
                     Write-Error ("Failed to Invoke $($resource.resourceName)" + ($TestError[0].Exception.Message))
@@ -32,7 +32,7 @@ function Invoke-DSC
 
                 elseif (($testResults.InDesiredState) -ne $true) {
                     Write-Output "[Start Set] [[$($resource.dscResourceName)]$($resource.ResourceName)]"
-                    Invoke-DscResource @splat -Method Set -ErrorVariable SetError -Verbose:$false | Out-Null
+                    Invoke-DscResource @splat -Method Set -ErrorVariable SetError -Verbose:$false
                 }
 
                 if ($SetError) {
