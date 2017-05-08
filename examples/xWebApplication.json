@@ -3,7 +3,7 @@
       {
          "resourceName":"Paylocity",
          "dscResourceName":"File",
-         "DestinationPath":"c:\\Paylocity\\DevOps",
+         "DestinationPath":"c:\\archtype\\DevOps",
          "Type":"Directory",
          "ensure":"Present"
       },
@@ -11,7 +11,7 @@
           "resourceName":"DevOpsApp",
           "dscResourceName":"xWebApplication",
           "name":"DevOps",
-          "PhysicalPath":"C:\\Paylocity\\DevOps",
+          "PhysicalPath":"C:\\archtype\\DevOps",
           "WebAppPool":"DefaultAppPool",
           "WebSite":"Default Web Site",
           "PreloadEnabled":true,

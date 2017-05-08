@@ -1,9 +1,9 @@
 {
    "DSCResourcesToExecute":[
       {
-         "resourceName":"PaylocitySite",
+         "resourceName":"archtypeSite",
          "dscResourceName":"xWebsite",
-         "name":"Paylocity",
+         "name":"archtype",
          "State":"Started",
          "physicalPath":"c:\\paylocity",
          "ensure":"Present",

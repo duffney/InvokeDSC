@@ -1,16 +1,16 @@
 {
    "DSCResourcesToExecute":[
       {
-         "resourceName":"Paylocity",
+         "resourceName":"archtype",
          "dscResourceName":"File",
-         "DestinationPath":"c:\\Paylocity",
+         "DestinationPath":"c:\\archtype",
          "Type":"Directory",
          "ensure":"Present"
       },
       {
-         "resourceName":"PaylocityTemp",
+         "resourceName":"archtypeService",
          "dscResourceName":"File",
-         "DestinationPath":"c:\\Paylocity\\Service",
+         "DestinationPath":"c:\\archtype\\Service",
          "Type":"Directory",
          "ensure":"Present"
       }

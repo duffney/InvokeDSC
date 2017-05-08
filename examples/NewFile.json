@@ -3,7 +3,7 @@
       {
           "resourceName":"NewFile",
           "dscResourceName":"File",
-          "destinationPath":"c:\\Paylocity\\Service\\file.txt",
+          "destinationPath":"c:\\archtype\\Service\\file.txt",
           "type":"File",
           "contents":"Test",
           "attributes":["hidden","archive"],

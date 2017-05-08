@@ -3,7 +3,7 @@
       {
           "resourceName":"ServicesVirtualDirectory",
           "dscResourceName":"xWebVirtualDirectory",
-          "PhysicalPath":"C:\\Paylocity\\Service",
+          "PhysicalPath":"C:\\archtype\\Service",
           "name":"Service",
           "WebSite":"Default Web Site",
           "WebApplication":"",
