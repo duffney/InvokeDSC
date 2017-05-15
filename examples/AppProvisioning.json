@@ -52,7 +52,7 @@
       {
           "resourceName":"EscherFolderAR",
           "dscResourceName":"cNtfsPermissionEntry",
-          "Path":"c:\\archtype\\EscherFolders\\Logs",
+          "Path":"c:\\archtype\\Logs",
           "Principal":"IIS APPPOOL\\DevOps",
           "AccessControlInformation":[
              {
