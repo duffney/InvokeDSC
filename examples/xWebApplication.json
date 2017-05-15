@@ -1,7 +1,7 @@
 {
    "DSCResourcesToExecute":[
       {
-         "resourceName":"Paylocity",
+         "resourceName":"archtype",
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype\\DevOps",
          "Type":"Directory",

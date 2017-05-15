@@ -5,7 +5,7 @@
          "dscResourceName":"xWebsite",
          "name":"archtype",
          "State":"Started",
-         "physicalPath":"c:\\paylocity",
+         "physicalPath":"c:\\archtype",
          "ensure":"Present",
          "bindingInfo":[
             {
