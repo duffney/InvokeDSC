@@ -1,4 +1,7 @@
 {
+   "Modules":[
+        "xWebAdministration"
+   ],      
    "DSCResourcesToExecute":[
       {
          "resourceName":"archtype",

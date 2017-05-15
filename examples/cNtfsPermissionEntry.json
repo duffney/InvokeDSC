@@ -1,7 +1,10 @@
 {
+    "Modules":[
+       "cNtfsAccessControl" 
+    ],
    "DSCResourcesToExecute":[
       {
-         "resourceName":"EscherFolderAR",
+         "resourceName":"LogPermissions",
          "dscResourceName":"cNtfsPermissionEntry",
          "Path":"c:\\archtype\\Logs",
          "Principal":"IIS APPPOOL\\DevOps",

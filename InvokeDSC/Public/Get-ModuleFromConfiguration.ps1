@@ -1,4 +1,4 @@
-function Get-DSCResourceModule {
+function Get-ModuleFromConfiguration {
 <#
 .SYNOPSIS
     Short description
@@ -18,6 +18,7 @@ function Get-DSCResourceModule {
     )
     
     begin {
+
         if (!($Recurse))
         {
             $data = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -30,19 +31,9 @@ function Get-DSCResourceModule {
     
     process {
         
-        foreach ($dscResource in $data.DSCResourcesToExecute) 
+        foreach ($module in $data.Modules) 
         {
-            
-            if ($dscResource.dscResourceName -eq 'File')
-            {
-                $moduleName = 'PSDesiredStateConfiguration'
-            } 
-           else
-           {
-                $moduleName = (Get-DscResource -Name $dscResource.dscResourceName).ModuleName
-           }
-            
-            [string[]]$modules += $moduleName
+            [string[]]$modules += $module
         }
     }
     
@@ -51,4 +42,6 @@ function Get-DSCResourceModule {
     }
 }
 
-#Get-DSCResourceModule -Path 'C:\Users\jduffney\Documents\GitHub\Invoke-DSC\examples\AppProvisioning.json'
+#Get-ModuleFromConfiguration -Path 'C:\Users\jduffney\Documents\GitHub\Invoke-DSC\examples\AppProvisioning.json'
+
+#Get-ModuleFromConfiguration -Path 'C:\Users\jduffney\Documents\GitHub\Invoke-DSC\examples\' -Recurse
