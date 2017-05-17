@@ -41,8 +41,8 @@ Describe "Function Loaded" {
             $result.ModuleName | should be 'PSDesiredStateConfiguration'
         }
 
-        it "destinationPath should be c:\Paylocity\Service\file.txt" {
-            $result.Property.destinationPath | should be 'c:\Paylocity\Service\file.txt'
+        it "destinationPath should be c:\archtype\Service\file.txt" {
+            $result.Property.destinationPath | should be 'c:\archtype\Service\file.txt'
         }
 
         it "force should be true" {
