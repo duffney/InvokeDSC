@@ -41,7 +41,3 @@ function Get-ModuleFromConfiguration {
         $modules | Select-Object -Unique
     }
 }
-
-#Get-ModuleFromConfiguration -Path 'C:\Users\jduffney\Documents\GitHub\Invoke-DSC\examples\AppProvisioning.json'
-
-#Get-ModuleFromConfiguration -Path 'C:\Users\jduffney\Documents\GitHub\Invoke-DSC\examples\' -Recurse
