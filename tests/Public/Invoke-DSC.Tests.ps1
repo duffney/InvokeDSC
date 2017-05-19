@@ -33,7 +33,7 @@ Describe "Function Loaded" {
     }
 
     it "run Invoke-DSC" {
-        (Invoke-DSC -Resources $resource) | should not beNullorEmpty
+        (Invoke-DSC -Resource $resource) | should not beNullorEmpty
     }
 
     it "file.txt should exist" {
@@ -43,11 +43,7 @@ Describe "Function Loaded" {
     it "content should be [test]" {
         (Get-Content 'C:\archtype\file.txt') | should be 'Test'
     }
-
-    it "attributes should be Hidden|Archive" {
-        (Get-ItemProperty C:\archtype\Service\file.txt).Attributes | should match ([regex]::('\bHidden\b|\bArchive\b'))
-    }
-
+    
     AfterAll {
         Remove-Item -Path C:\archtype -Recurse -Force
     }

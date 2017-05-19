@@ -35,7 +35,7 @@ function Invoke-DscConfiguration {
     process
     {
         Write-Verbose -Message "Invoking Dsc resources"
-        Invoke-DSC -Resources $resourceObject
+        Invoke-DSC -Resource $resourceObject
     }
     
     end

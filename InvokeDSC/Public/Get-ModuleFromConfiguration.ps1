@@ -25,7 +25,7 @@ function Get-ModuleFromConfiguration {
         }
         else
         {
-            $data = Get-ChildItem -Path $Path -Recurse -File | Get-Content -Raw  | ConvertFrom-Json
+            $data = Get-ChildItem -Path $Path -Recurse -File | Where-Object Name -Match '.json$' | Get-Content -Raw  | ConvertFrom-Json
         }
     }
     
