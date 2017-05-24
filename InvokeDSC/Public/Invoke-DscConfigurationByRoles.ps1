@@ -1,7 +1,7 @@
 function Invoke-DscConfigurationByRoles {
 <#
 .SYNOPSIS
-    Invokes Dsc configurations by matching role names
+    Invokes Dsc configurations by matching role names.
 .DESCRIPTION
     Scans a specified directory recursivly to locate matching .json configuration documents. Each .json
     configuration document is then converted to a PowerShell object and invoked.

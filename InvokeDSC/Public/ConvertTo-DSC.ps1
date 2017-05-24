@@ -1,4 +1,4 @@
-function ConvertTo-DSC {
+function ConvertTo-Dsc {
 <#
 .SYNOPSIS
     Converts json DSL files to PSCustomObject
@@ -11,7 +11,7 @@ function ConvertTo-DSC {
 .PARAMETER InputObject
     Specifies an InputObject containing json synatx
 .EXAMPLE
-    ConvertTo-DSC -Path 'c:\json\example.json'
+    ConvertTo-Dsc -Path 'c:\json\example.json'
 #>
     [CmdletBinding()]
     param(

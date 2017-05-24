@@ -1,13 +1,16 @@
 function Invoke-DscConfiguration {
 <#
 .SYNOPSIS
-    Short description
+    Invokes a specified configuration file with Desired State Configuration
 .DESCRIPTION
-    Long description
+    Prases the specified configuration file and extracts out unique Dsc resource
+    modules required and attempts to download them. Once the modules are obtained it converts
+    the configuration document to a PowerShell object which is passed to Invoke-Dsc to
+    invoke the resources.
 .EXAMPLE
-    Example of how to use this cmdlet
+    Invoke-DscConfiguration -Path 'c:\config\NewFile.json'
 .EXAMPLE
-    Another example of how to use this cmdlet
+    Invoke-DscConfiguration -Path 'c:\config\NewFile.json' -Repository PSGallery
 #>
     [CmdletBinding()]
     param(
@@ -24,8 +27,20 @@ function Invoke-DscConfiguration {
 
         foreach ($module in $modules) 
         {
-            Write-Verbose -Message "Installing [$module]"
-            Install-Module -Name $module -Repository $Repository -Confirm:$false
+            Write-Verbose -Message "Verifying [$module] exists"
+            
+            if (!(Get-Module -name $module -ListAvailable))
+            {
+                Write-Verbose -Message "[$module]  not found"
+                Write-Verbose -Message "Installing [$module]"
+                Install-Module -Name $module -Repository $Repository -Confirm:$false                
+            }
+            else
+            {
+                Write-Verbose -Message "Module [$module] already exists"
+            }
+
+
         }
 
         Write-Verbose -Message "Converting configuration to Dsc Object"

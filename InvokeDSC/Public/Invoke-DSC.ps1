@@ -1,5 +1,24 @@
-function Invoke-DSC
+function Invoke-Dsc
 {
+<#
+.SYNOPSIS
+Invokes Dsc resources
+
+.DESCRIPTION
+Passes PSCustomObjects to Invoke-DscResource first by invoking the test method and
+if the test method fails invokes the set method.
+
+.PARAMETER Resource
+Specifies the PSCustomObject to be passed to Invoke-DscResource
+
+.EXAMPLE
+$r = ConvertTo-Dsc -Path 'c:\Config\NewFile.json'
+Invoke-Dsc -Resource $r
+
+.NOTES
+Wraps around the native Invoke-DscResource cmdlet and invokes them as native Dsc would
+by running the test method first and if the test method fails it invokes the set method.
+#>    
     [CmdletBinding()]
     Param
     (
