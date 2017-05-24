@@ -1,0 +1,25 @@
+{
+    "Modules":[
+       "cNtfsAccessControl" 
+    ],
+   "DSCResourcesToExecute":[
+      {
+         "resourceName":"LogPermissions",
+         "dscResourceName":"cNtfsPermissionEntry",
+         "Path":"c:\\archtype\\Logs",
+         "Principal":"IIS APPPOOL\\DevOps",
+         "AccessControlInformation":[
+            {
+               "CimType":"cNtfsAccessControlInformation",
+               "Properties":{
+                  "AccessControlType":"Allow",
+                  "FileSystemRights":["Modify"],
+                  "Inheritance":"ThisFolderSubfoldersAndFiles",
+                  "NoPropagateInherit":false
+               }
+            }
+         ],
+         "ensure":"Present"
+      }
+   ]
+}

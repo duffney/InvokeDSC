@@ -1,0 +1,23 @@
+{
+   "Modules":[
+        "xWebAdministration"
+   ],
+   "DSCResourcesToExecute":[
+      {
+         "resourceName":"archtype",
+         "dscResourceName":"File",
+         "DestinationPath":"c:\\archtype",
+         "Type":"Directory",
+         "ensure":"Present"
+      },      
+      {
+          "resourceName":"ServicesVirtualDirectory",
+          "dscResourceName":"xWebVirtualDirectory",
+          "PhysicalPath":"C:\\archtype",
+          "name":"archtype",
+          "WebSite":"Default Web Site",
+          "WebApplication":"",
+          "Ensure":"Present"
+      }
+   ]
+}

@@ -38,3 +38,8 @@ $Resource = ConvertTo-DSC -Path 'C:\DSC\NewFile.json'
 ```PowerShell
 Invoke-DSC -Resource $Resource -Verbose
 ```
+### Credits
+
+[POSHOrigin](https://github.com/devblackops/POSHOrigin) by [Brandon Olin](https://github.com/devblackops)
+[Ansible-win_dsc](https://github.com/trondhindenes/Ansible-win_dsc) by [Trond Hindenes](https://github.com/trondhindenes)
+[Steven Murawski](https://github.com/smurawski)
