@@ -17,7 +17,7 @@ function ConvertTo-Dsc {
     param(
         [Parameter(Mandatory=$true,ParameterSetName='Path',Position=0)]
         [string]$Path,
-        [Parameter(Mandatory=$true,ParameterSetName='InputObject',Position=0)]
+        [Parameter(Mandatory=$true,ParameterSetName='InputObject',Position=1)]
         [object[]]$InputObject
     )
 
@@ -58,7 +58,7 @@ function ConvertTo-Dsc {
                 $prop = $resource.Properties | Where-Object {$_.Name -eq $configKey.Name}
 
                 if ($ConfigKey.Value -is [array]) {
-
+                    
                     foreach ($key in $ConfigKey.Value) {
 
                         if ($key.psobject.Properties['CimType']) {
@@ -69,6 +69,7 @@ function ConvertTo-Dsc {
                                 $cimhash[$_.Name] = $_.Value
                             }
 
+                            #\[\w+\[\]\] (Regex) detects CimInstance array
                             if ($prop.PropertyType -match '\[\w+\[\]\]') {
                                 [ciminstance[]]$value += New-CimInstance -ClassName $key.CimType -Property $cimhash -ClientOnly
                             } else {
@@ -80,7 +81,7 @@ function ConvertTo-Dsc {
                     }
 
                     $config.Property.Add($configKey.Name,$value)
-                    $value = $null
+                    Remove-Variable -Name Value -Force
 
                 } else {
                     $config.Property.Add($configKey.Name,$configKey.Value)
