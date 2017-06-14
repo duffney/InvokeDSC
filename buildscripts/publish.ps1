@@ -20,7 +20,7 @@ try {
 
 	## Publish module to PowerShell Gallery
 	$publishParams = @{
-		Path = $env:APPVEYOR_BUILD_FOLDER
+		Path = "$env:APPVEYOR_BUILD_FOLDER\InvokeDSC"
 		NuGetApiKey = $env:nuget_apikey
 		Repository = 'PSGallery'
 		Force = $true
