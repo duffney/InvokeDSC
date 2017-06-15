@@ -1,6 +1,7 @@
 {
    "Modules":[
-        "xWebAdministration"
+        "xWebAdministration",
+        "cNtfsAccessControl"
    ],   
    "DSCResourcesToExecute":[
       {
