@@ -1,6 +1,5 @@
 version: 1.1.{build}
--
-  branches:
+ branches:
     only:
       - master
 environment:
