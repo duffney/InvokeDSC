@@ -9,9 +9,8 @@ Describe "Function Loaded" {
     BeforeAll {
         $newFileJson = @"
 {
-   "DSCResourcesToExecute":[
-      {
-          "resourceName":"NewFile",
+   "DSCResourcesToExecute":{
+       "NewFile":{
           "dscResourceName":"File",
           "destinationPath":"c:\\archtype\\file.txt",
           "type":"File",
@@ -19,8 +18,8 @@ Describe "Function Loaded" {
           "attributes":["hidden","archive"],
           "ensure":"Present",
           "force":true
+          }
       }
-   ]
 }
 "@
 
@@ -29,9 +28,8 @@ Describe "Function Loaded" {
    "Modules":[
         "xWebAdministration"
    ],
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtypeSite",
+   "DSCResourcesToExecute":{
+      "archtypeSite":{
          "dscResourceName":"xWebsite",
          "name":"archtype",
          "State":"Started",
@@ -65,7 +63,7 @@ Describe "Function Loaded" {
                 }
            ]
       }
-   ]
+   }
 }
 "@
 
@@ -74,16 +72,14 @@ Describe "Function Loaded" {
    "Modules":[
         "xWebAdministration"
    ],      
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtype",
+   "DSCResourcesToExecute":{
+      "archtype": {
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype\\DevOps",
          "Type":"Directory",
          "ensure":"Present"
       },
-      {
-          "resourceName":"DevOpsApp",
+      "DevOpsApp": {
           "dscResourceName":"xWebApplication",
           "name":"DevOps",
           "PhysicalPath":"C:\\archtype\\DevOps",
@@ -102,7 +98,7 @@ Describe "Function Loaded" {
                 }
            ]
       }
-   ]
+   }
 }
 "@
 

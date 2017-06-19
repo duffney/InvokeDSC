@@ -3,23 +3,20 @@
         "xWebAdministration",
         "cNtfsAccessControl"
    ],   
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtype",
+   "DSCResourcesToExecute":{
+      "archtype":{
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype",
          "Type":"Directory",
          "ensure":"Present"
       },
-      {
-         "resourceName":"DevOpsDir",
+      "DevOpsDir":{
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype\\DevOps",
          "Type":"Directory",
          "ensure":"Present"
       },
-      {
-         "resourceName":"DevOpsAppPool",
+      "DevOpsAppPool":{
          "dscResourceName":"xWebAppPool",
          "name":"DevOps",
          "managedRuntimeVersion":"v4.0",
@@ -33,8 +30,7 @@
          "autoStart":true,
          "ensure":"Present"
       },
-      {
-          "resourceName":"DevOpsApp",
+      "DevOpsApp":{
           "dscResourceName":"xWebApplication",
           "name":"DevOps",
           "PhysicalPath":"C:\\archtype\\DevOps",
@@ -53,8 +49,7 @@
                 }
            ]
       },
-      {
-          "resourceName":"EscherFolderAR",
+      "LogAccess":{
           "dscResourceName":"cNtfsPermissionEntry",
           "Path":"c:\\archtype\\Logs",
           "Principal":"IIS APPPOOL\\DevOps",
@@ -71,5 +66,5 @@
           ],
           "ensure":"Present"
       }
-   ]
+   }
 }

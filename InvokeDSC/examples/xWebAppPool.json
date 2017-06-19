@@ -2,8 +2,8 @@
     "Modules":[
     "xWebAdministration"
 ],
-   "DSCResourcesToExecute":[
-      {
+   "DSCResourcesToExecute":{
+      "DevOpsAppPool":{
          "resourceName":"DevOpsAppPool",
          "dscResourceName":"xWebAppPool",
          "name":"DevOps",
@@ -18,5 +18,5 @@
          "autoStart":true,
          "ensure":"Present"
       }
-   ]
+   }
 }

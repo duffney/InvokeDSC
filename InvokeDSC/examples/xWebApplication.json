@@ -2,16 +2,14 @@
    "Modules":[
         "xWebAdministration"
    ],      
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtype",
+   "DSCResourcesToExecute":{
+      "archtype":{
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype\\DevOps",
          "Type":"Directory",
          "ensure":"Present"
       },
-      {
-          "resourceName":"DevOpsApp",
+      "DevOpsApp":{
           "dscResourceName":"xWebApplication",
           "name":"DevOps",
           "PhysicalPath":"C:\\archtype\\DevOps",
@@ -30,5 +28,5 @@
                 }
            ]
       }
-   ]
+   }
 }

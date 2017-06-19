@@ -2,9 +2,14 @@
    "Modules":[
         "xWebAdministration"
    ],
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtypeSite",
+   "DSCResourcesToExecute":{
+     "archtype": {
+         "dscResourceName":"File",
+         "DestinationPath":"c:\\archtype",
+         "Type":"Directory",
+         "ensure":"Present"
+      },         
+      "archtypeSite":{
          "dscResourceName":"xWebsite",
          "name":"archtype",
          "State":"Started",
@@ -38,5 +43,5 @@
                 }
            ]
       }
-   ]
+   }
 }
