@@ -1,4 +1,7 @@
 version: 1.1.{build}
+branches:
+  only:
+    - master
 environment:
   nuget_apikey:
     secure: 2avi0nYMizAMuNattBXvOUAzUCvnQyC+5gktZ2JF3Mx16hRPnSwWbmMJFous2ij6
