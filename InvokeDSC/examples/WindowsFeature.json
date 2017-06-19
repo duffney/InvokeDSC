@@ -1,16 +1,14 @@
 {
-   "DSCResourcesToExecute":[
-      {
-          "resourceName":"WebServer",
+   "DSCResourcesToExecute":{
+      "WebServerFeature":{
           "dscResourceName":"WindowsFeature",
           "name":"web-server",
           "ensure":"Present"
       },
-      {
-          "resourceName":"WebMgmtTools",
+      "WebMgmtToolsFeature":{
           "dscResourceName":"WindowsFeature",
           "name":"Web-Mgmt-Tools",
           "ensure":"Present"
       }
-   ]
+   }
 }

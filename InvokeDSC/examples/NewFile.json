@@ -1,14 +1,13 @@
 {
-   "DSCResourcesToExecute":[
-      {
-          "resourceName":"NewFile",
+   "DSCResourcesToExecute":{
+      "NewFile":{
           "dscResourceName":"File",
-          "destinationPath":"c:\\archtype\\Service\\file.txt",
+          "destinationPath":"c:\\archtype\\file.txt",
           "type":"File",
           "contents":"Test",
           "attributes":["hidden","archive"],
           "ensure":"Present",
           "force":true
       }
-   ]
+   }
 }

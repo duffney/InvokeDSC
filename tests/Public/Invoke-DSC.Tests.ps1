@@ -11,9 +11,8 @@ Describe "Function Loaded" {
     BeforeAll {
         $jsonInput = @"
 {
-   "DSCResourcesToExecute":[
-      {
-          "resourceName":"NewFile",
+   "DSCResourcesToExecute":{
+      "NewFile:": {
           "dscResourceName":"File",
           "destinationPath":"c:\\archtype\\file.txt",
           "type":"File",
@@ -22,7 +21,7 @@ Describe "Function Loaded" {
           "ensure":"Present",
           "force":true
       }
-   ]
+   }
 }
 "@
         $resource = ConvertTo-DSC -InputObject $jsonInput

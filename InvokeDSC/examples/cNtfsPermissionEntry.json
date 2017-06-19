@@ -2,12 +2,18 @@
     "Modules":[
        "cNtfsAccessControl" 
     ],
-   "DSCResourcesToExecute":[
-      {
+   "DSCResourcesToExecute":{
+      "archtype":{
+         "dscResourceName":"File",
+         "DestinationPath":"c:\\archtype",
+         "Type":"Directory",
+         "ensure":"Present"
+      },       
+      "LogPermissions":{
          "resourceName":"LogPermissions",
          "dscResourceName":"cNtfsPermissionEntry",
-         "Path":"c:\\archtype\\Logs",
-         "Principal":"IIS APPPOOL\\DevOps",
+         "Path":"c:\\archtype",
+         "Principal":"everyone",
          "AccessControlInformation":[
             {
                "CimType":"cNtfsAccessControlInformation",
@@ -21,5 +27,5 @@
          ],
          "ensure":"Present"
       }
-   ]
+   }
 }

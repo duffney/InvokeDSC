@@ -17,7 +17,7 @@ function ConvertTo-Dsc {
     param(
         [Parameter(Mandatory = $true, ParameterSetName = 'Path', Position = 0)]
         [string]$Path,
-        [Parameter(Mandatory = $true, ParameterSetName = 'InputObject', Position = 0)]
+        [Parameter(Mandatory = $true, ParameterSetName = 'InputObject', Position = 1)]
         [object[]]$InputObject
     )
     begin {
@@ -89,4 +89,3 @@ function ConvertTo-Dsc {
 }
 #$test = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\xwebsite.json
 #$test = ConvertTo-DSC -InputObject (Get-Content $PSScriptRoot\..\..\examples\xwebsite.json)
-$test = ConvertTo-Dsc -Path C:\temp\NewJsonFormat.json

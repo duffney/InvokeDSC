@@ -112,9 +112,8 @@ Describe "Get-ModuleFromConfiguration Tests" {
     "Modules":[
        "cNtfsAccessControl" 
     ],
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"LogPermissions",
+   "DSCResourcesToExecute":{
+      "LogPermissions":{
          "dscResourceName":"cNtfsPermissionEntry",
          "Path":"c:\\archtype\\Logs",
          "Principal":"IIS APPPOOL\\DevOps",
@@ -131,8 +130,8 @@ Describe "Get-ModuleFromConfiguration Tests" {
          ],
          "ensure":"Present"
       }
-   ]
-}    
+   }
+}       
 "@
 
     New-Item -Path 'testdrive:\newfile.json' -Value $newFileJson -ItemType File

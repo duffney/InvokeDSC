@@ -1,18 +1,16 @@
 {
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtype",
+   "DSCResourcesToExecute":{
+     "archtype": {
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype",
          "Type":"Directory",
          "ensure":"Present"
       },
-      {
-         "resourceName":"archtypeService",
+      "archtypeService":{
          "dscResourceName":"File",
          "DestinationPath":"c:\\archtype\\Service",
          "Type":"Directory",
          "ensure":"Present"
       }
-   ]
+   }
 }
