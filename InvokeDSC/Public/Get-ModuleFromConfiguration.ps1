@@ -9,28 +9,33 @@ function Get-ModuleFromConfiguration {
     Specifies the path to the configuration file(s) to parse.
 .PARAMETER Recurse
     Indicates that this cmdlet gets the items in the specified locations and in all child items of the locations.
+.PARAMETER InputObject
+    Specifies an InputObject containing json synatx
 .EXAMPLE
     Get-ModuleFromConfiguration -Path c:\Configs\NewFile.json
 .EXAMPLE
     Get-ModuleFromConfiguration -Path c:\Configs\ -Recurse
+.EXAMPLE
+    Get-ModuleFromConfiguration -InputObject $json-object
 #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]$Path,
-        [switch]$Recurse
-
+        [Parameter(Mandatory = $true, ParameterSetName = 'Path', Position = 0)]
+        [string]$Path,[switch]$Recurse,
+        [Parameter(Mandatory = $true, ParameterSetName = 'InputObject', Position = 1)]
+        [object[]]$InputObject
     )
-    
     begin {
-
-        if (!($Recurse))
+        
+        if (!($Recurse) -and ($PSBoundParameters.ContainsKey('Path')))
         {
             $data = Get-Content -Path $Path -Raw | ConvertFrom-Json
         }
-        else
-        {
+        elseif ($PSBoundParameters.ContainsKey('Path')) {
             $data = Get-ChildItem -Path $Path -Recurse -File | Where-Object Name -Match '.json$' | Get-Content -Raw  | ConvertFrom-Json
+        }
+        else {
+            $data = $InputObject | ConvertFrom-Json
         }
     }
     

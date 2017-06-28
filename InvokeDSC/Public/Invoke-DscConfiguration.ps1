@@ -7,15 +7,23 @@ function Invoke-DscConfiguration {
     modules required and attempts to download them. Once the modules are obtained it converts
     the configuration document to a PowerShell object which is passed to Invoke-Dsc to
     invoke the resources.
+.PARAMETER Path
+    Specifies the path to a .json file.
+.PARAMETER InputObject
+    Specifies an InputObject containing json synatx
 .EXAMPLE
     Invoke-DscConfiguration -Path 'c:\config\NewFile.json'
 .EXAMPLE
     Invoke-DscConfiguration -Path 'c:\config\NewFile.json' -Repository PSGallery
+.EXAMPLE
+    Invoke-DscConfiguration -InputObject $json-object 
 #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Path', Position = 0)]
         [string]$Path,
+        [Parameter(Mandatory = $true, ParameterSetName = 'InputObject', Position = 1)]
+        [object[]]$InputObject,
         [Parameter(Mandatory=$false)]
         [string]$Repository = 'PSGallery'
     )
@@ -23,7 +31,14 @@ function Invoke-DscConfiguration {
     begin 
     {
         Write-Verbose -Message "Getting required modules"
-        $modules = Get-ModuleFromConfiguration -Path $Path
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            $modules = Get-ModuleFromConfiguration -Path $Path
+        }
+        else {
+            $modules = Get-ModuleFromConfiguration -InputObject $InputObject
+        }
+        
+        
 
         foreach ($module in $modules) 
         {
@@ -44,7 +59,13 @@ function Invoke-DscConfiguration {
         }
 
         Write-Verbose -Message "Converting configuration to Dsc Object"
-        $resourceObject = ConvertTo-DSC -Path $Path
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            $resourceObject = ConvertTo-DSC -Path $Path
+        }
+        else {
+            $resourceObject = ConvertTo-DSC -InputObject $InputObject
+        }
+        
     }
     
     process
