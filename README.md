@@ -12,9 +12,8 @@ Allows you to declaratively define your infrastructure within JSON configuration
 
 ```JSON
 {
-   "DSCResourcesToExecute":[
-      {
-          "resourceName":"NewFile",
+   "DSCResourcesToExecute":{
+      "NewFile":{
           "dscResourceName":"File",
           "destinationPath":"c:\\DevOps\\Service\\file.txt",
           "type":"File",
@@ -23,7 +22,7 @@ Allows you to declaratively define your infrastructure within JSON configuration
           "ensure":"Present",
           "force":true
       }
-   ]
+   }
 }
 ```
 
@@ -38,6 +37,14 @@ $Resource = ConvertTo-DSC -Path 'C:\DSC\NewFile.json'
 ```PowerShell
 Invoke-DSC -Resource $Resource -Verbose
 ```
+
+###
+
+```PowerShell
+Invoke-DscConfiguration -Path 'C:\DSC\NewFile.json'
+```
+
+
 ### Credits
 
 [POSHOrigin](https://github.com/devblackops/POSHOrigin) by [Brandon Olin](https://github.com/devblackops)
