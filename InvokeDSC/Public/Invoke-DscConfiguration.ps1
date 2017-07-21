@@ -48,7 +48,7 @@ function Invoke-DscConfiguration {
             {
                 Write-Verbose -Message "[$module]  not found"
                 Write-Verbose -Message "Installing [$module]"
-                Install-Module -Name $module -Repository $Repository -Confirm:$false                
+                Find-Module $module -Repository $Repository | Sort-Object Version -Descending | Install-Module -Confirm:$false                
             }
             else
             {
