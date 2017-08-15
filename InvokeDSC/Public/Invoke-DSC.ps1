@@ -32,14 +32,21 @@ by running the test method first and if the test method fails it invokes the set
     Process
     {
         foreach ($r in $Resource) {
-
-            try {
-                
+              
                 $splat = @{
                     Name = $r.dscResourceName
                     Property = $r.Property
-                    ModuleName = $r.ModuleName
+                    #ModuleName = $r.ModuleName
                     ErrorAction = 'SilentlyContinue'
+                }
+
+                if ($r.ModuleVersion -ne $null)
+                {
+                    $splat.Add('ModuleName',@{ModuleName=$($r.ModuleName);ModuleVersion=$($r.ModuleVersion)})
+                }
+                else
+                {
+                    $splat.Add('ModuleName',$r.ModuleName)
                 }
                 
                 Write-Output "[Start Test] [[$($r.dscResourceName)]$($r.ResourceName)]"
@@ -57,13 +64,7 @@ by running the test method first and if the test method fails it invokes the set
                 if ($SetError) {
                     Write-Error "Failed to invoke [$($r.resourceName)] ($SetError[0].Exception.Message)"
                 }
-            }
-            catch [System.Exception] {
-                # Exception is stored in the automatic variable _
-
-            }
-
-            }
+        }
     }
     End
     {

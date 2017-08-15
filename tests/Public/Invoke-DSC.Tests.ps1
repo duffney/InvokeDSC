@@ -6,7 +6,7 @@ $here = $here -replace 'tests', 'InvokeDSC'
 . "$here\$sut"
 . "$here\ConvertTo-DSC.ps1"
 
-Describe "Function Loaded" {
+Describe "Invoke-Dsc Tests" {
 
     BeforeAll {
         $jsonInput = @"
@@ -24,7 +24,27 @@ Describe "Function Loaded" {
    }
 }
 "@
+
+$moduleVersion = @"
+{
+   "Modules":[
+       {
+           "ModuleName":"xPSDesiredStateConfiguration",
+           "ModuleVersion":"6.4.0.0"
+       }
+],
+  "DSCResourcesToExecute":{
+       "DevOpsGroup":{
+           "dscResourceName":"xGroup",
+           "GroupName":"DevOps",
+           "ensure":"Present"
+       }
+  }
+}
+    
+"@
         $resource = ConvertTo-DSC -InputObject $jsonInput
+        $moduleVersionResource = ConvertTo-Dsc -InputObject $moduleVersion
     }
 
     it "command exists" {
@@ -42,8 +62,16 @@ Describe "Function Loaded" {
     it "content should be [test]" {
         (Get-Content 'C:\archtype\file.txt') | should be 'Test'
     }
+
+    It "DevOps Group should exist" {
+        Invoke-DSC -Resource $moduleVersionResource
+        (Get-LocalGroup -Name DevOps) | should not beNullorEmpty
+    }
     
+    #add test for module version not found
+
     AfterAll {
         Remove-Item -Path C:\archtype -Recurse -Force
+        Remove-LocalGroup -Name DevOps
     }
 }

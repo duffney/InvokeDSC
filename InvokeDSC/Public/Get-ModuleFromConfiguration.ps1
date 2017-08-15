@@ -21,7 +21,7 @@ function Get-ModuleFromConfiguration {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, ParameterSetName = 'Path', Position = 0)]
-        [string]$Path,[switch]$Recurse,
+        [string]$Path,
         [Parameter(Mandatory = $true, ParameterSetName = 'InputObject', Position = 1)]
         [object[]]$InputObject
     )
@@ -31,23 +31,40 @@ function Get-ModuleFromConfiguration {
         {
             $data = Get-Content -Path $Path -Raw | ConvertFrom-Json
         }
-        elseif ($PSBoundParameters.ContainsKey('Path')) {
-            $data = Get-ChildItem -Path $Path -Recurse -File | Where-Object Name -Match '.json$' | Get-Content -Raw  | ConvertFrom-Json
-        }
         else {
             $data = $InputObject | ConvertFrom-Json
         }
     }
-    
+
     process {
         
+        if ([bool]$data.modules.psobject.properties.value.moduleversion) 
+        {
+            $modules = $data.modules
+            $modules = $modules | Get-Unique -AsString
+        }
+
+        if (!([bool]$data.modules.psobject.properties.value.moduleversion)){
         foreach ($module in $data.Modules) 
         {
-            [string[]]$modules += $module
+            $modules += $module
         }
+        }
+
     }
     
     end {
-        $modules | Select-Object -Unique
+        if ([bool]$data.modules.psobject.properties.value.moduleversion) 
+        {
+            return $modules
+        } else {
+
+        }
+
+        if (!([bool]$data.modules.psobject.properties.value.moduleversion)){
+            $modules = $modules | Select-Object -Unique
+            return $modules
+        }        
+        
     }
 }

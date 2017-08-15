@@ -8,11 +8,18 @@ $here = $here -replace 'tests', 'InvokeDSC'
 Describe "Get-ModuleFromConfiguration Tests" {
 
     BeforeAll {
-        $newFileJson = @"
+        $multipleModulesNoVersion = @"
 {
-   "DSCResourcesToExecute":[
-      {
-          "resourceName":"NewFile",
+    "Modules":[
+        {
+            "ModuleName":"xPSDesiredStateConfiguration"
+        },
+        {
+            "ModuleName":"xWebAdministration"
+        }
+    ],
+   "DSCResourcesToExecute":{
+      "NewFile":{
           "dscResourceName":"File",
           "destinationPath":"c:\\archtype\\file.txt",
           "type":"File",
@@ -21,14 +28,16 @@ Describe "Get-ModuleFromConfiguration Tests" {
           "ensure":"Present",
           "force":true
       }
-   ]
+   }
 }
 "@
 
-    $xWebSiteJson = @"
+    $singleModuleNoVersion = @"
 {
    "Modules":[
-        "xWebAdministration"
+        {
+            "ModuleName":"xWebAdministration"
+        }
    ],
    "DSCResourcesToExecute":[
       {
@@ -70,102 +79,120 @@ Describe "Get-ModuleFromConfiguration Tests" {
 }
 "@
 
-    $xWebApplication = @"
-{
-   "Modules":[
-        "xWebAdministration"
-   ],      
-   "DSCResourcesToExecute":[
-      {
-         "resourceName":"archtype",
-         "dscResourceName":"File",
-         "DestinationPath":"c:\\archtype\\DevOps",
-         "Type":"Directory",
-         "ensure":"Present"
-      },
-      {
-          "resourceName":"DevOpsApp",
-          "dscResourceName":"xWebApplication",
-          "name":"DevOps",
-          "PhysicalPath":"C:\\archtype\\DevOps",
-          "WebAppPool":"DefaultAppPool",
-          "WebSite":"Default Web Site",
-          "PreloadEnabled":true,
-          "EnabledProtocols":["http"],
-          "Ensure":"Present",
-          "AuthenticationInfo":[
-                {
-                    "CimType":"MSFT_xWebApplicationAuthenticationInformation",
-                    "Properties":{
-                        "Anonymous":true,
-                        "Basic":true
-                    }
-                }
-           ]
-      }
-   ]
-}
-"@
-
-    $CntfsAccessControl = @"
+    $singleModuleVersion = @"
 {
     "Modules":[
-       "cNtfsAccessControl" 
+        {
+            "ModuleName":"xPSDesiredStateConfiguration",
+            "ModuleVersion":"6.4.0.0"
+        }        
     ],
    "DSCResourcesToExecute":{
-      "LogPermissions":{
-         "dscResourceName":"cNtfsPermissionEntry",
-         "Path":"c:\\archtype\\Logs",
-         "Principal":"IIS APPPOOL\\DevOps",
-         "AccessControlInformation":[
-            {
-               "CimType":"cNtfsAccessControlInformation",
-               "Properties":{
-                  "AccessControlType":"Allow",
-                  "FileSystemRights":["Modify"],
-                  "Inheritance":"ThisFolderSubfoldersAndFiles",
-                  "NoPropagateInherit":false
-               }
-            }
-         ],
-         "ensure":"Present"
+      "NewFile":{
+          "dscResourceName":"File",
+          "destinationPath":"c:\\archtype\\file.txt",
+          "type":"File",
+          "contents":"Test",
+          "attributes":["hidden","archive"],
+          "ensure":"Present",
+          "force":true
       }
    }
-}       
+}
 "@
 
-    New-Item -Path 'testdrive:\newfile.json' -Value $newFileJson -ItemType File
-    New-Item -Path 'testdrive:\xWebSite.json' -Value $xWebSiteJson -ItemType File
-    New-Item -Path 'testdrive:\xWebApplication.json' -Value $xWebApplication -ItemType File
-    New-Item -Path 'testdrive:\cNtfsAccessControl.json' -Value $cNtfsAccessControl -ItemType File
+    $multipleModulesVersion = @"
+{
+    "Modules":[
+        {
+            "ModuleName":"xPSDesiredStateConfiguration",
+            "ModuleVersion":"6.4.0.0"
+        },
+        {
+            "ModuleName":"xWebAdministration",
+            "ModuleVersion":"1.17.0.0"
+        },
+        {
+            "ModuleName":"xWebAdministration",
+            "ModuleVersion":"1.17.0.0"
+        }        
+    ],
+   "DSCResourcesToExecute":{
+      "NewFile":{
+          "dscResourceName":"File",
+          "destinationPath":"c:\\archtype\\file.txt",
+          "type":"File",
+          "contents":"Test",
+          "attributes":["hidden","archive"],
+          "ensure":"Present",
+          "force":true
+      }
+   }
+}
+"@
+
+    New-Item -Path 'testdrive:\multipleModulesNoVersion.json' -Value $multipleModulesNoVersion -ItemType File
+    New-Item -Path 'testdrive:\singleModuleNoVersion.json' -Value $singleModuleNoVersion -ItemType File
+    New-Item -Path 'testdrive:\singleModuleVersion.json' -Value $singleModuleVersion -ItemType File
+    New-Item -Path 'testdrive:\multipleModulesVersion.json' -Value $multipleModulesVersion -ItemType File
 }
 
-    it "command should exists" {
+    it 'command should exists' {
         Get-Command -Name Get-ModuleFromConfiguration | should not BeNullOrEmpty
     }
 
-    Context "Single Configuration" {
+    Context 'Single Module' {
         
-        $result = Get-ModuleFromConfiguration -Path 'testdrive:\xWebSite.json'
+        $result = Get-ModuleFromConfiguration -Path 'testdrive:\singleModuleNoVersion.json'
 
         it "Count Should Be 1" {
-            $result.count | should be 1
+            $result.ModuleName.count | should be 1
         }
 
         it "Should Match xWebAdministration" {
-            $result | should be 'xWebAdministration'
+            $result.ModuleName | should be 'xWebAdministration'
         }
     }
 
-    Context "Multiple Configurations" {
-        $result = Get-ModuleFromConfiguration -Path 'testdrive:' -Recurse
+    Context 'Multipule Modules' {
+        $result = Get-ModuleFromConfiguration -Path 'testdrive:\multipleModulesNoVersion.json'
 
-        it "Count Should BeGreaterThan 2" {
-            $result.count | should BeGreaterThan 1
+        it 'Count Should Be 2' {
+            $result.ModuleName.count | should be 2
         }
 
-        it "Should match xWebAdministration|cNtfsAccessControl" {
-            $result | should match ([regex]::('xWebAdministration|cNtfsAccessControl'))
+        it 'Should match xWebAdministration|xPSDesiredStateConfiguration' {
+            $result.ModuleName | should match 'xWebAdministration|xPSDesiredStateConfiguration'
         }
     }
+
+    Context 'Single Module with ModuleVersion' {
+        $result = Get-ModuleFromConfiguration -Path 'testdrive:\singleModuleVersion.json'
+
+        it 'ModuleVersion should be 6.4.0.0' {
+            $result.ModuleVersion | should be '6.4.0.0'
+        }
+
+        it 'PSobject Properties should match ModuleName|ModuleVersion' {
+            ($result.psobject.properties.name) | should match 'ModuleName|ModuleVersion'
+        }
+    }
+
+    Context 'Multiple Modules with ModuleVersion' {
+        $result = Get-ModuleFromConfiguration -Path 'testdrive:\multipleModulesVersion.json'
+
+        it 'ModuleVersion count should be 2' {
+            $result.ModuleVersion.count | should be 2
+        }
+
+        it 'xPSDesiredStateConfiguration ModuleVersion should Match 6.4.0.0' {
+            ($result | Where-Object ModuleName -EQ 'xPSDesiredStateConfiguration').ModuleVersion | should be '6.4.0.0'
+        }
+
+        it 'xWebAdministration ModuleVersion should Match 1.17.0.0' {
+            ($result | Where-Object ModuleName -EQ 'xWebAdministration').ModuleVersion | should be '1.17.0.0'
+        }        
+    }
+
+    #Input objects
 }

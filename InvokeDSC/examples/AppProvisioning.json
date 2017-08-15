@@ -1,22 +1,26 @@
 {
    "Modules":[
-        "xWebAdministration",
-        "cNtfsAccessControl"
+        {
+            "ModuleName":"xWebAdministration"
+        },
+        {
+            "ModuleName":"cNtfsAccessControl"
+        }
    ],   
    "DSCResourcesToExecute":{
-      "archtype":{
-         "dscResourceName":"File",
-         "DestinationPath":"c:\\archtype",
-         "Type":"Directory",
-         "ensure":"Present"
-      },
-      "DevOpsDir":{
-         "dscResourceName":"File",
-         "DestinationPath":"c:\\archtype\\DevOps",
-         "Type":"Directory",
-         "ensure":"Present"
-      },
-      "DevOpsAppPool":{
+    "archtype":{
+        "dscResourceName":"File",
+        "DestinationPath":"c:\\archtype",
+        "Type":"Directory",
+        "ensure":"Present"
+     },
+     "DevOpsDir":{
+        "dscResourceName":"File",
+        "DestinationPath":"c:\\archtype\\DevOps",
+        "Type":"Directory",
+        "ensure":"Present"
+     },      
+    "DevOpsAppPool":{
          "dscResourceName":"xWebAppPool",
          "name":"DevOps",
          "managedRuntimeVersion":"v4.0",

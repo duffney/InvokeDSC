@@ -37,25 +37,37 @@ function Invoke-DscConfiguration {
         else {
             $modules = Get-ModuleFromConfiguration -InputObject $InputObject
         }
-        
-        
 
         foreach ($module in $modules) 
         {
             Write-Verbose -Message "Verifying [$module] exists"
             
-            if (!(Get-Module -name $module -ListAvailable))
+            if ($module.psobject.Properties.name -match 'ModuleVersion') 
             {
-                Write-Verbose -Message "[$module]  not found"
-                Write-Verbose -Message "Installing [$module]"
-                Find-Module $module -Repository $Repository | Sort-Object Version -Descending | Install-Module -Confirm:$false                
+                if (!(Get-Module -FullyQualifiedName @{ModuleName=$module.modulename;moduleversion=$module.moduleversion} -ListAvailable)) 
+                {
+                    Write-Verbose -Message "[$module]  not found"
+                    Write-Verbose -Message "Installing [$module]"
+                    Install-Module -Name $module.ModuleName -RequiredVersion $module.ModuleVersion -Repository $Repository
+                }
+                else
+                {
+                    Write-Verbose -Message "Module [$($module.ModuleName)] already exists"
+                }
             }
             else
             {
-                Write-Verbose -Message "Module [$module] already exists"
+                if (!(Get-Module -name $module.modulename -ListAvailable))
+                {
+                    Write-Verbose -Message "[$module]  not found"
+                    Write-Verbose -Message "Installing [$module]"
+                    Find-Module $module.modulename -Repository $Repository | Sort-Object Version -Descending | Install-Module -Confirm:$false                
+                }
+                else
+                {
+                    Write-Verbose -Message "Module [$module] already exists"
+                }
             }
-
-
         }
 
         Write-Verbose -Message "Converting configuration to Dsc Object"
@@ -79,3 +91,5 @@ function Invoke-DscConfiguration {
         
     }
 }
+
+Invoke-DscConfiguration -Path C:\temp\ModuleJson.json

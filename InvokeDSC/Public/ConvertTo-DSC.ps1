@@ -37,11 +37,25 @@ function ConvertTo-Dsc {
         foreach ($dscResourceProperty in $dscResourceProperties) {
             $dscResource = $dscResourceProperty.Value
             $dscObj = New-Object psobject
-            $resource = Get-DscResource -Name $dscResource.dscResourceName
-            $module = $resource.ModuleName
+            $resource = (Get-DscResource -Name $dscResource.dscResourceName | Sort-Object Version -Descending)[0]
+            
             if ($dscResource.dscResourceName -eq 'file') {
                 $module = 'PSDesiredStateConfiguration'
+            } else {
+                $module = $resource.ModuleName                
             }
+            
+            if ($($data.Modules.psobject.properties.value.moduleversion) -ne $null -and $data.Modules -match $module)
+            {
+                $moduleVersion = ($data.Modules | Where-Object ModuleName -Match $module).ModuleVersion
+                
+                if ($resource.Version -notmatch $moduleVersion)
+                {
+                    $resource = Get-DscResource -Name $dscResource.dscResourceName | Where-Object Version -Match $moduleVersion
+                }
+            }
+
+
             $Config = @{
                 Name     = ($dscResource.dscResourceName)
                 Property = @{
@@ -79,6 +93,16 @@ function ConvertTo-Dsc {
             $dscObj | Add-Member -MemberType NoteProperty -Name resourceName -Value $dscResourceProperty.Name
             $dscObj | Add-Member -MemberType NoteProperty -Name dscResourceName -Value $dscResource.dscResourceName
             $dscObj | Add-Member -MemberType NoteProperty -Name ModuleName -Value $module
+
+            if ($($data.Modules.psobject.properties.value.moduleversion) -ne $null -and $data.Modules -match $module)
+            {
+                $dscObj | Add-Member -MemberType NoteProperty -Name ModuleVersion -Value $moduleVersion
+            }
+            else
+            {
+                $dscObj | Add-Member -MemberType NoteProperty -Name ModuleVersion -Value $null
+            }
+
             $dscObj | Add-Member -MemberType NoteProperty -Name Property -Value $Config.Property
             $alldscObj += $dscObj
         }

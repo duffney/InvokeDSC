@@ -24,87 +24,117 @@ Describe "Function Loaded" {
 "@
 
     $xWebSiteJson = @"
-{
-   "Modules":[
-        "xWebAdministration"
-   ],
-   "DSCResourcesToExecute":{
-      "archtypeSite":{
-         "dscResourceName":"xWebsite",
-         "name":"archtype",
-         "State":"Started",
-         "physicalPath":"c:\\archtype",
-         "ensure":"Present",
-         "bindingInfo":[
-            {
-               "CimType":"MSFT_xWebBindingInformation",
-               "Properties":{
-                     "protocol":"http",
-                     "port":8081,
-                     "ipaddress":"127.0.0.1"
-                  }
-            },
-            {
-               "CimType":"MSFT_xWebBindingInformation",
-               "Properties":{
-                     "protocol":"http",
-                     "port":8080,
-                     "ipaddress":"127.0.0.1"
-                  }
-            }
-         ],
-          "AuthenticationInfo":[
-                {
-                    "CimType":"MSFT_xWebAuthenticationInformation",
+    {
+        "Modules":[
+             {
+                 "ModuleName":"xWebAdministration"
+             }
+        ],
+        "DSCResourcesToExecute":{
+          "archtype": {
+              "dscResourceName":"File",
+              "DestinationPath":"c:\\archtype",
+              "Type":"Directory",
+              "ensure":"Present"
+           },         
+           "archtypeSite":{
+              "dscResourceName":"xWebsite",
+              "name":"archtype",
+              "State":"Started",
+              "physicalPath":"c:\\archtype",
+              "ensure":"Present",
+              "bindingInfo":[
+                 {
+                    "CimType":"MSFT_xWebBindingInformation",
                     "Properties":{
-                        "Anonymous":true,
-                        "Basic":true
-                    }
-                }
-           ]
-      }
-   }
-}
+                          "protocol":"http",
+                          "port":8081,
+                          "ipaddress":"127.0.0.1"
+                       }
+                 },
+                 {
+                    "CimType":"MSFT_xWebBindingInformation",
+                    "Properties":{
+                          "protocol":"http",
+                          "port":8080,
+                          "ipaddress":"127.0.0.1"
+                       }
+                 }
+              ],
+               "AuthenticationInfo":[
+                     {
+                         "CimType":"MSFT_xWebAuthenticationInformation",
+                         "Properties":{
+                             "Anonymous":true,
+                             "Basic":true
+                         }
+                     }
+                ]
+           }
+        }
+     }
 "@
 
     $xWebApplication = @"
-{
-   "Modules":[
-        "xWebAdministration"
-   ],      
-   "DSCResourcesToExecute":{
-      "archtype": {
-         "dscResourceName":"File",
-         "DestinationPath":"c:\\archtype\\DevOps",
-         "Type":"Directory",
-         "ensure":"Present"
-      },
-      "DevOpsApp": {
-          "dscResourceName":"xWebApplication",
-          "name":"DevOps",
-          "PhysicalPath":"C:\\archtype\\DevOps",
-          "WebAppPool":"DefaultAppPool",
-          "WebSite":"Default Web Site",
-          "PreloadEnabled":true,
-          "EnabledProtocols":["http"],
-          "Ensure":"Present",
-          "AuthenticationInfo":[
-                {
-                    "CimType":"MSFT_xWebApplicationAuthenticationInformation",
-                    "Properties":{
-                        "Anonymous":true,
-                        "Basic":true
-                    }
-                }
-           ]
-      }
-   }
-}
+    {
+        "Modules":[
+             {
+                 "ModuleName":"xWebAdministration"
+             }
+        ],      
+        "DSCResourcesToExecute":{
+           "archtype":{
+              "dscResourceName":"File",
+              "DestinationPath":"c:\\archtype\\DevOps",
+              "Type":"Directory",
+              "ensure":"Present"
+           },
+           "DevOpsApp":{
+               "dscResourceName":"xWebApplication",
+               "name":"DevOps",
+               "PhysicalPath":"C:\\archtype\\DevOps",
+               "WebAppPool":"DefaultAppPool",
+               "WebSite":"Default Web Site",
+               "PreloadEnabled":true,
+               "EnabledProtocols":["http"],
+               "Ensure":"Present",
+               "AuthenticationInfo":[
+                     {
+                         "CimType":"MSFT_xWebApplicationAuthenticationInformation",
+                         "Properties":{
+                             "Anonymous":true,
+                             "Basic":true
+                         }
+                     }
+                ]
+           }
+        }
+     }
+"@
+
+     $moduleVersion = @"
+     {
+        "Modules":[
+            {
+                "ModuleName":"xPSDesiredStateConfiguration",
+                "ModuleVersion":"6.4.0.0"
+            }
+    ],
+       "DSCResourcesToExecute":{
+            "DevOpsGroup":{
+                "dscResourceName":"xGroup",
+                "GroupName":"DevOps",
+                "ensure":"Present"
+            }
+       }
+    }
+         
 "@
 
     New-Item -Path 'testdrive:\newfile.json' -Value $newFileJson -ItemType File
     New-Item -Path 'testdrive:\xWebSite.json' -Value $xWebSiteJson -ItemType File
     New-Item -Path 'testdrive:\xWebApplication.json' -Value $xWebApplication -ItemType File
+    New-Item -Path 'testdrive:\moduleVersion.json' -Value $moduleVersion -ItemType File
 }    
 
     Context "Parameter Tests" {
@@ -180,7 +210,7 @@ Describe "Function Loaded" {
         $result = ConvertTo-DSC -Path 'testdrive:\xWebSite.json'
 
         it "bindinginfo should be CimInstance[]" {
-            $result.Property.bindinginfo.GetType().Name | should be 'CimInstance[]'
+            $result[1].Property.bindinginfo.GetType().Name | should be 'CimInstance[]'
         }
 
         it "bindinginfo port should be UInt32" {
@@ -193,6 +223,95 @@ Describe "Function Loaded" {
 
         it "bindinginfo protocol should be String" {
             $result.Property.bindinginfo[0].protocol | should BeofType 'string'
+        }
+    }
+}
+
+Describe 'Module Version Tests' {
+
+    BeforeAll {
+
+     $moduleVersion = @"
+     {
+        "Modules":[
+            {
+                "ModuleName":"xPSDesiredStateConfiguration",
+                "ModuleVersion":"6.4.0.0"
+            }
+    ],
+       "DSCResourcesToExecute":{
+            "DevOpsGroup":{
+                "dscResourceName":"xGroup",
+                "GroupName":"DevOps",
+                "ensure":"Present"
+            }
+       }
+    }
+         
+"@
+$xWebSiteJson = @"
+{
+    "Modules":[
+         {
+             "ModuleName":"xWebAdministration"
+         }
+    ],
+    "DSCResourcesToExecute":{
+      "archtype": {
+          "dscResourceName":"File",
+          "DestinationPath":"c:\\archtype",
+          "Type":"Directory",
+          "ensure":"Present"
+       },         
+       "archtypeSite":{
+          "dscResourceName":"xWebsite",
+          "name":"archtype",
+          "State":"Started",
+          "physicalPath":"c:\\archtype",
+          "ensure":"Present",
+          "bindingInfo":[
+             {
+                "CimType":"MSFT_xWebBindingInformation",
+                "Properties":{
+                      "protocol":"http",
+                      "port":8081,
+                      "ipaddress":"127.0.0.1"
+                   }
+             },
+             {
+                "CimType":"MSFT_xWebBindingInformation",
+                "Properties":{
+                      "protocol":"http",
+                      "port":8080,
+                      "ipaddress":"127.0.0.1"
+                   }
+             }
+          ],
+           "AuthenticationInfo":[
+                 {
+                     "CimType":"MSFT_xWebAuthenticationInformation",
+                     "Properties":{
+                         "Anonymous":true,
+                         "Basic":true
+                     }
+                 }
+            ]
+       }
+    }
+ }
+"@
+        New-Item -Path 'testdrive:\moduleVersion.json' -Value $moduleVersion -ItemType File
+        New-Item -Path 'testdrive:\xWebSite.json' -Value $xWebSiteJson -ItemType File
+    }
+    Context "Module Versions" {
+        $result = ConvertTo-DSC -Path 'testdrive:\xWebSite.json'
+        $moduleVersionResult = ConvertTo-Dsc -Path 'testdrive:\moduleVersion.json'
+        it 'ModuleVersion should be $null' {
+            $result[1].Property.ModuleVersion | should be $null
+        }
+
+        it 'ModuleVersion should be 6.4.0.0' {
+            $moduleVersionResult.ModuleVersion | should be '6.4.0.0'
         }
     }
 }
