@@ -4,6 +4,7 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 $here = $here -replace 'tests', 'InvokeDSC'
 
 . "$here\$sut"
+. "$here\Get-ModuleFromConfiguration.ps1"
 
 Describe "Install-ModuleFromConfiguration Specified Module Version" {
 
