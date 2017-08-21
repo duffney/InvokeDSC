@@ -27,12 +27,9 @@ Describe "Invoke-Dsc Tests" {
 
 $moduleVersion = @"
 {
-   "Modules":[
-       {
-           "ModuleName":"xPSDesiredStateConfiguration",
-           "ModuleVersion":"6.4.0.0"
-       }
-],
+   "Modules":{
+           "xPSDesiredStateConfiguration":"6.4.0.0"
+   },
   "DSCResourcesToExecute":{
        "DevOpsGroup":{
            "dscResourceName":"xGroup",

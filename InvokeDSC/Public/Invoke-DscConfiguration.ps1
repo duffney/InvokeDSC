@@ -30,44 +30,13 @@ function Invoke-DscConfiguration {
     
     begin 
     {
-        Write-Verbose -Message "Getting required modules"
-        if ($PSBoundParameters.ContainsKey('Path')) {
-            $modules = Get-ModuleFromConfiguration -Path $Path
-        }
-        else {
-            $modules = Get-ModuleFromConfiguration -InputObject $InputObject
-        }
-
-        foreach ($module in $modules) 
+        if ($PSBoundParameters.ContainsKey('Path')) 
         {
-            Write-Verbose -Message "Verifying [$module] exists"
-            
-            if ($module.psobject.Properties.name -match 'ModuleVersion') 
-            {
-                if (!(Get-Module -FullyQualifiedName @{ModuleName=$module.modulename;moduleversion=$module.moduleversion} -ListAvailable)) 
-                {
-                    Write-Verbose -Message "[$module]  not found"
-                    Write-Verbose -Message "Installing [$module]"
-                    Install-Module -Name $module.ModuleName -RequiredVersion $module.ModuleVersion -Repository $Repository
-                }
-                else
-                {
-                    Write-Verbose -Message "Module [$($module.ModuleName)] already exists"
-                }
-            }
-            else
-            {
-                if (!(Get-Module -name $module.modulename -ListAvailable))
-                {
-                    Write-Verbose -Message "[$module]  not found"
-                    Write-Verbose -Message "Installing [$module]"
-                    Find-Module $module.modulename -Repository $Repository | Sort-Object Version -Descending | Install-Module -Confirm:$false                
-                }
-                else
-                {
-                    Write-Verbose -Message "Module [$module] already exists"
-                }
-            }
+            Install-ModuleFromConfiguration -Path $Path -Repository $Repository
+        }
+        else 
+        {
+            Install-ModuleFromConfiguration -InputObject $InputObject -Repository $Repository
         }
 
         Write-Verbose -Message "Converting configuration to Dsc Object"
@@ -91,5 +60,3 @@ function Invoke-DscConfiguration {
         
     }
 }
-
-Invoke-DscConfiguration -Path C:\temp\ModuleJson.json

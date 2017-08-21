@@ -1,12 +1,8 @@
 {
-   "Modules":[
-        {
-            "ModuleName":"xWebAdministration"
-        },
-        {
-            "ModuleName":"cNtfsAccessControl"
-        }
-   ],   
+   "Modules":{
+            "xWebAdministration":null,
+            "cNtfsAccessControl":null
+    },   
    "DSCResourcesToExecute":{
     "archtype":{
         "dscResourceName":"File",

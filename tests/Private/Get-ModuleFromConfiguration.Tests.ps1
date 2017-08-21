@@ -10,35 +10,29 @@ Describe "Get-ModuleFromConfiguration Tests" {
     BeforeAll {
         $multipleModulesNoVersion = @"
 {
-    "Modules":[
-        {
-            "ModuleName":"xPSDesiredStateConfiguration"
-        },
-        {
-            "ModuleName":"xWebAdministration"
+    "Modules":{
+        "xPSDesiredStateConfiguration":null,
+        "xWebAdministration":null
+    },
+    "DSCResourcesToExecute":{
+        "NewFile":{
+            "dscResourceName":"File",
+            "destinationPath":"c:\\archtype\\file.txt",
+            "type":"File",
+            "contents":"Test",
+            "attributes":["hidden","archive"],
+            "ensure":"Present",
+            "force":true
         }
-    ],
-   "DSCResourcesToExecute":{
-      "NewFile":{
-          "dscResourceName":"File",
-          "destinationPath":"c:\\archtype\\file.txt",
-          "type":"File",
-          "contents":"Test",
-          "attributes":["hidden","archive"],
-          "ensure":"Present",
-          "force":true
-      }
-   }
+    }
 }
 "@
 
     $singleModuleNoVersion = @"
 {
-   "Modules":[
-        {
-            "ModuleName":"xWebAdministration"
-        }
-   ],
+   "Modules":{
+        "xWebAdministration":null
+    },
    "DSCResourcesToExecute":[
       {
          "resourceName":"archtypeSite",
@@ -81,12 +75,9 @@ Describe "Get-ModuleFromConfiguration Tests" {
 
     $singleModuleVersion = @"
 {
-    "Modules":[
-        {
-            "ModuleName":"xPSDesiredStateConfiguration",
-            "ModuleVersion":"6.4.0.0"
-        }        
-    ],
+    "Modules":{
+        "xPSDesiredStateConfiguration":"6.4.0.0"        
+    },
    "DSCResourcesToExecute":{
       "NewFile":{
           "dscResourceName":"File",
@@ -103,20 +94,10 @@ Describe "Get-ModuleFromConfiguration Tests" {
 
     $multipleModulesVersion = @"
 {
-    "Modules":[
-        {
-            "ModuleName":"xPSDesiredStateConfiguration",
-            "ModuleVersion":"6.4.0.0"
-        },
-        {
-            "ModuleName":"xWebAdministration",
-            "ModuleVersion":"1.17.0.0"
-        },
-        {
-            "ModuleName":"xWebAdministration",
-            "ModuleVersion":"1.17.0.0"
-        }        
-    ],
+    "Modules":{
+        "xPSDesiredStateConfiguration":"6.4.0.0",
+        "xWebAdministration":"1.17.0.0"
+    },
    "DSCResourcesToExecute":{
       "NewFile":{
           "dscResourceName":"File",
@@ -131,10 +112,27 @@ Describe "Get-ModuleFromConfiguration Tests" {
 }
 "@
 
+$noModules = @"
+{
+    "DSCResourcesToExecute":{
+        "NewFile":{
+            "dscResourceName":"File",
+            "destinationPath":"c:\\archtype\\file.txt",
+            "type":"File",
+            "contents":"Test",
+            "attributes":["hidden","archive"],
+            "ensure":"Present",
+            "force":true
+        }
+    }
+}
+"@
+
     New-Item -Path 'testdrive:\multipleModulesNoVersion.json' -Value $multipleModulesNoVersion -ItemType File
     New-Item -Path 'testdrive:\singleModuleNoVersion.json' -Value $singleModuleNoVersion -ItemType File
     New-Item -Path 'testdrive:\singleModuleVersion.json' -Value $singleModuleVersion -ItemType File
     New-Item -Path 'testdrive:\multipleModulesVersion.json' -Value $multipleModulesVersion -ItemType File
+    New-Item -Path 'testdrive:\noModules.json' -Value $noModules -ItemType File
 }
 
     it 'command should exists' {
@@ -146,11 +144,11 @@ Describe "Get-ModuleFromConfiguration Tests" {
         $result = Get-ModuleFromConfiguration -Path 'testdrive:\singleModuleNoVersion.json'
 
         it "Count Should Be 1" {
-            $result.ModuleName.count | should be 1
+            $result.count | should be 1
         }
 
         it "Should Match xWebAdministration" {
-            $result.ModuleName | should be 'xWebAdministration'
+            $result.Name | should be 'xWebAdministration'
         }
     }
 
@@ -158,11 +156,11 @@ Describe "Get-ModuleFromConfiguration Tests" {
         $result = Get-ModuleFromConfiguration -Path 'testdrive:\multipleModulesNoVersion.json'
 
         it 'Count Should Be 2' {
-            $result.ModuleName.count | should be 2
+            $result.count | should be 2
         }
 
         it 'Should match xWebAdministration|xPSDesiredStateConfiguration' {
-            $result.ModuleName | should match 'xWebAdministration|xPSDesiredStateConfiguration'
+            $result.Name | should match 'xWebAdministration|xPSDesiredStateConfiguration'
         }
     }
 
@@ -170,11 +168,11 @@ Describe "Get-ModuleFromConfiguration Tests" {
         $result = Get-ModuleFromConfiguration -Path 'testdrive:\singleModuleVersion.json'
 
         it 'ModuleVersion should be 6.4.0.0' {
-            $result.ModuleVersion | should be '6.4.0.0'
+            $result.Value | should be '6.4.0.0'
         }
 
-        it 'PSobject Properties should match ModuleName|ModuleVersion' {
-            ($result.psobject.properties.name) | should match 'ModuleName|ModuleVersion'
+        it 'Name should match xPSDesiredStateConfiguration' {
+            ($result.name) | should match 'xPSDesiredStateConfiguration'
         }
     }
 
@@ -182,16 +180,24 @@ Describe "Get-ModuleFromConfiguration Tests" {
         $result = Get-ModuleFromConfiguration -Path 'testdrive:\multipleModulesVersion.json'
 
         it 'ModuleVersion count should be 2' {
-            $result.ModuleVersion.count | should be 2
+            $result.count | should be 2
         }
 
         it 'xPSDesiredStateConfiguration ModuleVersion should Match 6.4.0.0' {
-            ($result | Where-Object ModuleName -EQ 'xPSDesiredStateConfiguration').ModuleVersion | should be '6.4.0.0'
+            ($result | Where-Object Name -EQ 'xPSdesiredStateConfiguration').value | should be '6.4.0.0'
         }
 
         it 'xWebAdministration ModuleVersion should Match 1.17.0.0' {
-            ($result | Where-Object ModuleName -EQ 'xWebAdministration').ModuleVersion | should be '1.17.0.0'
+            ($result | Where-Object Name -EQ 'xWebAdministration').value | should be '1.17.0.0'
         }        
+    }
+
+    Context 'No Modules' {
+        $result = Get-ModuleFromConfiguration -Path 'testdrive:\noModules.json'
+
+        it 'Count should be 0' {
+            $result.count | should be 0
+        }
     }
 
     #Input objects

@@ -45,9 +45,9 @@ function ConvertTo-Dsc {
                 $module = $resource.ModuleName                
             }
             
-            if ($($data.Modules.psobject.properties.value.moduleversion) -ne $null -and $data.Modules -match $module)
+            if ($data.Modules -match $module -and $data.Modules.$module -ne $null)
             {
-                $moduleVersion = ($data.Modules | Where-Object ModuleName -Match $module).ModuleVersion
+                $moduleVersion = ($data.Modules).$module
                 
                 if ($resource.Version -notmatch $moduleVersion)
                 {
@@ -94,7 +94,7 @@ function ConvertTo-Dsc {
             $dscObj | Add-Member -MemberType NoteProperty -Name dscResourceName -Value $dscResource.dscResourceName
             $dscObj | Add-Member -MemberType NoteProperty -Name ModuleName -Value $module
 
-            if ($($data.Modules.psobject.properties.value.moduleversion) -ne $null -and $data.Modules -match $module)
+            if ($data.Modules -match $module -and $data.Modules.$module -ne $null)
             {
                 $dscObj | Add-Member -MemberType NoteProperty -Name ModuleVersion -Value $moduleVersion
             }

@@ -1,9 +1,12 @@
 {
-   "Modules":[
-        {
-            "ModuleName":"xWebAdministration"
-        }
-   ],
+   "Modules":{
+            "xWebAdministration":null
+    },
+    "WebServerFeature":{
+        "dscResourceName":"WindowsFeature",
+        "name":"web-server",
+        "ensure":"Present"
+    },    
    "DSCResourcesToExecute":{
       "archtype":{
          "dscResourceName":"File",

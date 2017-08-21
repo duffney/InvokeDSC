@@ -1,11 +1,14 @@
 {
-    "Modules":[
-        {
-            "ModuleName":"xWebAdministration"
-        }
-],
+    "Modules":{
+            "xWebAdministration":null
+    },
    "DSCResourcesToExecute":{
-      "DevOpsAppPool":{
+        "WebServerFeature":{
+                "dscResourceName":"WindowsFeature",
+                "name":"web-server",
+                "ensure":"Present"
+        },      
+        "DevOpsAppPool":{
          "resourceName":"DevOpsAppPool",
          "dscResourceName":"xWebAppPool",
          "name":"DevOps",

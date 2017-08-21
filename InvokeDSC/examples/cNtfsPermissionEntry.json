@@ -1,9 +1,7 @@
 {
-    "Modules":[
-       {
-           "ModuleName":"cNtfsAccessControl" 
-       }
-    ],
+    "Modules":{
+           "cNtfsAccessControl":null 
+    },
    "DSCResourcesToExecute":{
       "archtype":{
          "dscResourceName":"File",

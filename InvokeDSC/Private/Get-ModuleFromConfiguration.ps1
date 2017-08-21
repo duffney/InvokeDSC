@@ -25,46 +25,28 @@ function Get-ModuleFromConfiguration {
         [Parameter(Mandatory = $true, ParameterSetName = 'InputObject', Position = 1)]
         [object[]]$InputObject
     )
-    begin {
-        
-        if (!($Recurse) -and ($PSBoundParameters.ContainsKey('Path')))
-        {
-            $data = Get-Content -Path $Path -Raw | ConvertFrom-Json
-        }
-        else {
-            $data = $InputObject | ConvertFrom-Json
-        }
+    begin 
+    {  
     }
 
-    process {
+    process 
+    {
         
-        if ([bool]$data.modules.psobject.properties.value.moduleversion) 
-        {
-            $modules = $data.modules
-            $modules = $modules | Get-Unique -AsString
+        Write-Verbose -Message "Getting required modules"
+        
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            $modules = (Get-Content -Path $Path -Raw | ConvertFrom-Json).modules
+            $modules = $modules.psobject.Properties | Where-Object {$_.MemberType -eq 'NoteProperty'}
         }
-
-        if (!([bool]$data.modules.psobject.properties.value.moduleversion)){
-        foreach ($module in $data.Modules) 
-        {
-            $modules += $module
-        }
+        else {
+            $modules = ($InputObject | ConvertFrom-Json).modules
+            $modules = $modules.psobject.Properties | Where-Object {$_.MemberType -eq 'NoteProperty'}
         }
 
     }
     
-    end {
-        if ([bool]$data.modules.psobject.properties.value.moduleversion) 
-        {
-            return $modules
-        } else {
-
-        }
-
-        if (!([bool]$data.modules.psobject.properties.value.moduleversion)){
-            $modules = $modules | Select-Object -Unique
-            return $modules
-        }        
-        
+    end 
+    {
+        return $modules
     }
 }

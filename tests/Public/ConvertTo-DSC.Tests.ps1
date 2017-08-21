@@ -25,11 +25,9 @@ Describe "Function Loaded" {
 
     $xWebSiteJson = @"
     {
-        "Modules":[
-             {
-                 "ModuleName":"xWebAdministration"
-             }
-        ],
+        "Modules":{
+                 "xWebAdministration":null
+        },
         "DSCResourcesToExecute":{
           "archtype": {
               "dscResourceName":"File",
@@ -77,11 +75,9 @@ Describe "Function Loaded" {
 
     $xWebApplication = @"
     {
-        "Modules":[
-             {
-                 "ModuleName":"xWebAdministration"
-             }
-        ],      
+        "Modules":{
+                 "xWebAdministration":null
+        },
         "DSCResourcesToExecute":{
            "archtype":{
               "dscResourceName":"File",
@@ -114,12 +110,9 @@ Describe "Function Loaded" {
 
      $moduleVersion = @"
      {
-        "Modules":[
-            {
-                "ModuleName":"xPSDesiredStateConfiguration",
-                "ModuleVersion":"6.4.0.0"
-            }
-    ],
+        "Modules":{
+                "xPSDesiredStateConfiguration":"6.4.0.0"
+    },
        "DSCResourcesToExecute":{
             "DevOpsGroup":{
                 "dscResourceName":"xGroup",
@@ -128,7 +121,6 @@ Describe "Function Loaded" {
             }
        }
     }
-         
 "@
 
     New-Item -Path 'testdrive:\newfile.json' -Value $newFileJson -ItemType File
@@ -233,12 +225,9 @@ Describe 'Module Version Tests' {
 
      $moduleVersion = @"
      {
-        "Modules":[
-            {
-                "ModuleName":"xPSDesiredStateConfiguration",
-                "ModuleVersion":"6.4.0.0"
-            }
-    ],
+        "Modules":{
+            "xPSDesiredStateConfiguration":"6.4.0.0"
+        },
        "DSCResourcesToExecute":{
             "DevOpsGroup":{
                 "dscResourceName":"xGroup",
@@ -251,11 +240,9 @@ Describe 'Module Version Tests' {
 "@
 $xWebSiteJson = @"
 {
-    "Modules":[
-         {
-             "ModuleName":"xWebAdministration"
-         }
-    ],
+    "Modules":{
+        "xWebAdministration":null
+    },
     "DSCResourcesToExecute":{
       "archtype": {
           "dscResourceName":"File",
