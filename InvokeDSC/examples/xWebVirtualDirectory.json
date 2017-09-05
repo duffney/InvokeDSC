@@ -1,5 +1,6 @@
 {
-   "Modules":{
+    "schema":"2.0.0",
+    "Modules":{
             "xWebAdministration":null
     },
     "WebServerFeature":{

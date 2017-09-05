@@ -1,4 +1,5 @@
 {
+    "schema":"2.0.0",
     "Modules":{
         "xPSDesiredStateConfiguration":"6.4.0.0"
     },

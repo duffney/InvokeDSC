@@ -1,5 +1,6 @@
 {
-   "DSCResourcesToExecute":{
+    "schema":"2.0.0",   
+    "DSCResourcesToExecute":{
       "WebServerFeature":{
           "dscResourceName":"WindowsFeature",
           "name":"web-server",

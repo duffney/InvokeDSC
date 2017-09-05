@@ -1,4 +1,5 @@
 {
+    "schema":"2.0.0",
     "Modules":{
            "cNtfsAccessControl":null 
     },

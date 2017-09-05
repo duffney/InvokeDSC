@@ -1,4 +1,4 @@
-version: 1.1.{build}
+version: 2.0.{build}
 environment:
   nuget_apikey:
     secure: 2avi0nYMizAMuNattBXvOUAzUCvnQyC+5gktZ2JF3Mx16hRPnSwWbmMJFous2ij6
