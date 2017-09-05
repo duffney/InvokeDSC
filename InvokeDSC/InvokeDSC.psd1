@@ -35,9 +35,6 @@ Description = 'InvokeDSC is a JSON based DSL for creating and managing infrastru
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.0'
 
-# Schema version for InvokeDsc JSON configuration documents.
-Schema = '2.0.0'
-
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 
