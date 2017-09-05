@@ -42,6 +42,9 @@ $moduleVersion = @"
 "@
         $resource = ConvertTo-DSC -InputObject $jsonInput
         $moduleVersionResource = ConvertTo-Dsc -InputObject $moduleVersion
+
+        Set-PackageSource -Name PSGallery -Trusted -Force
+        Install-Module -Name xPSDesiredStateConfiguration -Repository PSGallery -RequiredVersion '6.4.0.0' -Force -Confirm:$false        
     }
 
     it "command exists" {
