@@ -106,4 +106,9 @@ Describe 'No Modules' {
         $result = Install-ModuleFromConfiguration -Path 'testdrive:\noModules.json'
         Assert-MockCalled -CommandName Find-Module -Times 0
     }
+
+    AfterAll {
+        Set-PackageSource -Name PSGallery -Trusted -Force
+        Install-Module -Name xPSDesiredStateConfiguration -Repository PSGallery -Force -Confirm:$false
+    }
 }
