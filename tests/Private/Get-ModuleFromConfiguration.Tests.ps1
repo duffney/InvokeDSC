@@ -128,11 +128,28 @@ $noModules = @"
 }
 "@
 
+    $arrayModules = @"
+{
+    "Modules":[
+        "xPSDesiredStateConfiguration",
+        "xWebAdministration"
+    ],
+    "DSCResourcesToExecute":{
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
+    }
+}
+"@
+
     New-Item -Path 'testdrive:\multipleModulesNoVersion.json' -Value $multipleModulesNoVersion -ItemType File
     New-Item -Path 'testdrive:\singleModuleNoVersion.json' -Value $singleModuleNoVersion -ItemType File
     New-Item -Path 'testdrive:\singleModuleVersion.json' -Value $singleModuleVersion -ItemType File
     New-Item -Path 'testdrive:\multipleModulesVersion.json' -Value $multipleModulesVersion -ItemType File
     New-Item -Path 'testdrive:\noModules.json' -Value $noModules -ItemType File
+    New-Item -Path 'testdrive:\arrayModules.json' -Value $arrayModules -ItemType File
 }
 
     it 'command should exists' {
@@ -197,6 +214,30 @@ $noModules = @"
 
         it 'Count should be 0' {
             $result.count | should be 0
+        }
+    }
+
+    Context 'Array Modules' {
+        $result = Get-ModuleFromConfiguration -Path 'testdrive:\arrayModules.json'
+
+        it 'Name count should be 2' {
+            $result.Name.count | should be 2
+        }
+
+        it '$result[0] Name should match xPSDesiredStateConfiguration' {
+            $result[0].Name | should match 'xPSDesiredStateConfiguration'
+        }
+
+        it '$result[1] Name should match xWebAdministration' {
+            $result[1].Name | should match 'xWebAdministration'
+        }
+
+        it '$result[0] Value should be $null' {
+            $result[0].Value | should be $null
+        }
+
+        it '$result[1] Value should be $null' {
+            $result[1].Value | should be $null
         }
     }
 

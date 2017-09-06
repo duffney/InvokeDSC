@@ -1,5 +1,4 @@
 {
-   "schema":"2.0.0",
    "DSCResourcesToExecute":{
      "archtype": {
          "dscResourceName":"File",

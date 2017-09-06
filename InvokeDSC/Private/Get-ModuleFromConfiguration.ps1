@@ -35,12 +35,55 @@ function Get-ModuleFromConfiguration {
         Write-Verbose -Message "Getting required modules"
         
         if ($PSBoundParameters.ContainsKey('Path')) {
+            
             $modules = (Get-Content -Path $Path -Raw | ConvertFrom-Json).modules
-            $modules = $modules.psobject.Properties | Where-Object {$_.MemberType -eq 'NoteProperty'}
+            
+            if ($modules){
+                if ($modules.GetType().BaseType.Name -eq 'Array'){
+                    $modulesObj = @()
+
+                    foreach ($module in $modules)
+                    {
+                        $moduleObj = [PSCustomObject]@{
+                            Name = $module
+                            Value = $null
+                        }
+
+                        $modulesObj += $moduleObj
+                    }
+
+                    $modules = $modulesObj
+                }
+                else {
+                    $modules = $modules.psobject.Properties | Where-Object {$_.MemberType -eq 'NoteProperty'}
+                }
+            }
         }
         else {
+            
             $modules = ($InputObject | ConvertFrom-Json).modules
-            $modules = $modules.psobject.Properties | Where-Object {$_.MemberType -eq 'NoteProperty'}
+            
+            if ($modules){
+                if ($modules.GetType().BaseType.Name -eq 'Array'){
+                    $modulesObj = @()
+
+                    foreach ($module in $modules)
+                    {
+                        $moduleObj = [PSCustomObject]@{
+                            Name = $module
+                            Value = $null
+                        }
+
+                        $modulesObj += $moduleObj
+                    }
+
+                    $modules = $modulesObj
+                }
+                else
+                {
+                    $modules = $modules.psobject.Properties | Where-Object {$_.MemberType -eq 'NoteProperty'}                
+                }
+            }
         }
 
     }

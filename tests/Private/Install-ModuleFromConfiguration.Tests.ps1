@@ -103,7 +103,7 @@ Describe 'No Modules' {
 
     it 'Find-Module should be called 0 times' {
         mock -CommandName Find-Module -MockWith {}
-        $result = Install-ModuleFromConfiguration -Path 'testdrive:\noModules.json'
+        $null = Install-ModuleFromConfiguration -Path 'testdrive:\noModules.json'
         Assert-MockCalled -CommandName Find-Module -Times 0
     }
 }
