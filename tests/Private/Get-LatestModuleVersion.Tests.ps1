@@ -16,7 +16,7 @@ Describe "Get-LatestModuleVersion" {
         if ($pester.count -lt 2)
         {
             Set-PackageSource -Name PSGallery -Trusted -Force
-            Install-Module -Name Pester -Repository PSGallery -Force -Confirm:$false        
+            Install-Module -Name Pester -Repository PSGallery -RequiredVersion '4.0.7' -Force -Confirm:$false        
         }
     }
 
