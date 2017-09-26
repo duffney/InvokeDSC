@@ -41,7 +41,7 @@ Describe "Install-ModuleFromConfiguration Specified Module Version" {
         }
 
         It 'Module Version should match' {
-            (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable | Where-Object version -Match '6.0.0.0') | should not BeNullOrEmpty
+            (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable).Version | should match '6.0.0.0'
 
         }
 
@@ -50,7 +50,7 @@ Describe "Install-ModuleFromConfiguration Specified Module Version" {
 
 Describe 'Install-ModuleFromConfiguration No Specified Module Version' {
     BeforeAll {
-        $singleModuleVersion = 
+        $NoModuleVersion = 
 @"
     {
         "Modules":{
@@ -61,7 +61,7 @@ Describe 'Install-ModuleFromConfiguration No Specified Module Version' {
     }
 "@
     
-        New-Item -Path 'testdrive:\singleModuleVersion.json' -Value $singleModuleVersion -ItemType File
+        New-Item -Path 'testdrive:\NoModuleVersion.json' -Value $NoModuleVersion -ItemType File
         
         if (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable){
             (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable).modulebase | % {Remove-Item -Path $_ -Recurse -Force}
@@ -72,7 +72,7 @@ Describe 'Install-ModuleFromConfiguration No Specified Module Version' {
 
     Context 'No Specified Module Version' {
         
-        Install-ModuleFromConfiguration -Path 'testdrive:\singleModuleVersion.json'
+        Install-ModuleFromConfiguration -Path 'testdrive:\NoModuleVersion.json'
         
         It 'Module should exist' {
             (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable) | Should not BeNullOrEmpty
@@ -106,4 +106,42 @@ Describe 'No Modules' {
         $null = Install-ModuleFromConfiguration -Path 'testdrive:\noModules.json'
         Assert-MockCalled -CommandName Find-Module -Times 0
     }
+}
+
+Describe "ReturnShouldNotBeCalled" {
+    Context 'Will it work?' {
+$config = @"
+{
+    "Modules":{
+        "cChoco":null,
+        "PackageManagement":"1.1.6.0",
+        "PackageManagementProviderResource":null
+    },
+"DSCResourcesToExecute":{
+        "RegisterPowerShellFeed":{
+            "dscResourceName":"PackageManagementSource",
+            "name":"Internal",
+            "SourceUri":"https://artifact.paylocity.com/artifactory/api/nuget/powershell",
+            "providerName":"PowerShellGet",
+            "InstallationPolicy":"Trusted",
+            "ensure":"Present"
+        },
+        "chocoSource":{
+        "dscResourceName":"cChocoSource",
+            "Name":"PCTYchoco",
+            "Priority":0,
+            "source":"https://artifact.paylocity.com/artifactory/api/nuget/chocolatey-local"
+        }     
+    }
+}
+"@
+Mock Write-Verbose {} -Verifiable -ParameterFilter { $Message -eq 'No Modules declared in configuration...'}
+        It 'should not call return' {
+           {Install-ModuleFromConfiguration -InputObject $config} | should not throw
+        }
+
+        It 'mocking write-verbose' {
+            Assert-MockCalled Write-Verbose -Times 0 -Exactly
+        }
+    } 
 }

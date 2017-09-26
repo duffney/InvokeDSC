@@ -25,7 +25,7 @@ function Install-ModuleFromConfiguration {
         {
             $modules = Get-ModuleFromConfiguration -Path $Path
             
-            if ($modules)
+            if (!($modules))
             {
                 Write-Verbose -Message 'No Modules declared in configuration...'
                 return
@@ -35,7 +35,7 @@ function Install-ModuleFromConfiguration {
         {
             $modules = Get-ModuleFromConfiguration -InputObject $InputObject
             
-            if ($modules)
+            if (!($modules))
             {
                 Write-Verbose -Message 'No Modules declared in configuration...'
                 return

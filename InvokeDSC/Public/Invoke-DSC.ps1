@@ -46,7 +46,15 @@ by running the test method first and if the test method fails it invokes the set
                 }
                 else
                 {
-                    $splat.Add('ModuleName',$r.ModuleName)
+                    if ($r.ModuleName -eq 'PSDesiredStateConfiguration' -and $r.dscResourceName -eq 'File')
+                    {
+                        $splat.Add('ModuleName',$r.ModuleName)
+                    }
+                    else
+                    {
+                        $latestVersion = Get-LatestModuleVersion -Name $r.ModuleName
+                        $splat.Add('ModuleName',@{ModuleName=$($r.ModuleName);ModuleVersion=$latestVersion})
+                    }
                 }
                 
                 Write-Output "[Start Test] [[$($r.dscResourceName)]$($r.ResourceName)]"
