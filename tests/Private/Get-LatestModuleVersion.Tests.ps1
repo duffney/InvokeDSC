@@ -9,7 +9,7 @@ $here = $here -replace 'tests', 'InvokeDSC'
 
 Describe "Get-LatestModuleVersion" {
     BeforeAll {
-        
+        ## Replace with fake modules later
         $pester = Get-Module Pester -ListAvailable
         $latestVersion = ($pester | Sort-Object Version -Descending | Select-Object -First 1).Version.ToString()
 
@@ -18,6 +18,12 @@ Describe "Get-LatestModuleVersion" {
             Set-PackageSource -Name PSGallery -Trusted -Force
             Install-Module -Name Pester -Repository PSGallery -RequiredVersion '4.0.7' -Force -Confirm:$false        
         }
+
+        if(!(Get-Module xNetworking -ListAvailable))
+        {
+            Install-Module -Name xNetworking -Repository PSGallery -RequiredVersion '3.2.0.0' -Force -Confirm:$false
+        }
+
     }
 
     Context 'Input' {
@@ -36,7 +42,12 @@ Describe "Get-LatestModuleVersion" {
     }
 
     Context 'Execution' {
-
+        It 'SingleModuleVersion_ShouldNot_Throw' {
+            {Get-LatestModuleVersion -Name xNetworking} | should not Throw
+        }
+        It 'MultipleModuleVersions_ShouldNot_Throw' {
+            {Get-LatestModuleVersion -Name Pester} | should not Throw
+        }
     }
 
     Context 'Output' {

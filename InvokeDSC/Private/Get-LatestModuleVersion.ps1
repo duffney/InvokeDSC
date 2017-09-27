@@ -27,6 +27,10 @@ function Get-LatestModuleVersion {
                 if ($module.Count -gt 1) {
                     $version = ($module | Sort-Object Version -Descending | Select-Object -First 1).Version
                 }
+                else
+                {
+                    $version = ($module).Version
+                }
 
                 [string[]]$results += $version.ToString()
             }
