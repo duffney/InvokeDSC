@@ -47,7 +47,7 @@ function Install-ModuleFromConfiguration {
     {
         foreach ($module in $modules)
         {
-            if ($module.value -eq $null)
+            if ($null -eq $module.value)
             {
                 if (!(Get-Module -Name $module.Name -ListAvailable)){
                     Write-Verbose -Message "[$($module.Name)]  not found"

@@ -1,4 +1,4 @@
-function Invoke-DscConfigurationByRoles {
+function Invoke-DscConfigurationByRole {
 <#
 .SYNOPSIS
     Invokes Dsc configurations by matching role names.

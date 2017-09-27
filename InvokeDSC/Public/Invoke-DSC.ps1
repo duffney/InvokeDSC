@@ -40,7 +40,7 @@ by running the test method first and if the test method fails it invokes the set
                     ErrorAction = 'SilentlyContinue'
                 }
 
-                if ($r.ModuleVersion -ne $null)
+                if ($null -ne $r.ModuleVersion)
                 {
                     $splat.Add('ModuleName',@{ModuleName=$($r.ModuleName);ModuleVersion=$($r.ModuleVersion)})
                 }

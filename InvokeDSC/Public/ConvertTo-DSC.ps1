@@ -45,7 +45,7 @@ function ConvertTo-Dsc {
                 $module = $resource.ModuleName                
             }
             
-            if ($data.Modules -match $module -and $data.Modules.$module -ne $null)
+            if ($null -ne $data.Modules.$module -and $data.Modules -match $module)
             {
                 $moduleVersion = ($data.Modules).$module
                 
@@ -94,7 +94,7 @@ function ConvertTo-Dsc {
             $dscObj | Add-Member -MemberType NoteProperty -Name dscResourceName -Value $dscResource.dscResourceName
             $dscObj | Add-Member -MemberType NoteProperty -Name ModuleName -Value $module
 
-            if ($data.Modules -match $module -and $data.Modules.$module -ne $null)
+            if ($null -ne $data.Modules.$module -and $data.Modules -match $module)
             {
                 $dscObj | Add-Member -MemberType NoteProperty -Name ModuleVersion -Value $moduleVersion
             }
