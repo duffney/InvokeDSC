@@ -1,4 +1,3 @@
-#Requires -RunAsAdministrator
 #Requires -Version 5.0
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
@@ -9,21 +8,44 @@ $here = $here -replace 'tests', 'InvokeDSC'
 
 Describe "Get-LatestModuleVersion" {
     BeforeAll {
-        ## Replace with fake modules later
-        $pester = Get-Module Pester -ListAvailable
-        $latestVersion = ($pester | Sort-Object Version -Descending | Select-Object -First 1).Version.ToString()
-
-        if ($pester.count -lt 2)
-        {
-            Set-PackageSource -Name PSGallery -Trusted -Force
-            Install-Module -Name Pester -Repository PSGallery -RequiredVersion '4.0.7' -Force -Confirm:$false        
+        Function Get-Module {
+            param()
+            throw 'Fake Get-Module cmdlet'
         }
 
-        if(!(Get-Module xNetworking -ListAvailable))
-        {
-            Install-Module -Name xNetworking -Repository PSGallery -RequiredVersion '3.2.0.0' -Force -Confirm:$false
-        }
+        Mock -CommandName Get-Module {
+            @([PSCustomObject]@{
+                ModuleType = 'Script'
+                Version = '4.0.8'
+                Name = 'Pester'
+                ExportedCommands = {'Describe','Context'}
+            },
+            [PSCustomObject]@{
+                ModuleType = 'Script'
+                Version = '4.0.7'
+                Name = 'Pester'
+                ExportedCommands = {'Describe','Context'}
+            }
+            )
+        } -ParameterFilter {$Name -eq 'Pester'}
 
+        Mock -CommandName Get-Module {
+            [PSCustomObject]@{
+                ModuleType = 'Manifest'
+                Version = '3.2.0.0'
+                Name = 'Pester'
+                ExportedCommands = {'Convert-CIDRToSubhetMask','Test-IsNanoServer'}
+            }
+        } -ParameterFilter {$Name -eq 'xNetworking'}
+
+        Mock -CommandName Get-Module {
+            [PSCustomObject]@{
+                ModuleType = 'Binary'
+                Version = '1.0.0.1'
+                Name = 'PackageManagement'
+                ExportedCommands = {'Find-Package','Get-Package'}
+            }
+        } -ParameterFilter {$Name -eq 'PackageManagement'}
     }
 
     Context 'Input' {
@@ -34,7 +56,7 @@ Describe "Get-LatestModuleVersion" {
             (Get-LatestModuleVersion -Name Pester).Count | Should BeExactly 1
         }
         It 'MultipleInputs_Should_Not_Throw' {
-            {Get-LatestModuleVersion -Name Pester} | Should Not Throw
+            {Get-LatestModuleVersion -Name Pester,PackageManagement} | Should Not Throw
         }
         It 'Should_Return_Count_2' {
             (Get-LatestModuleVersion -Name Pester,PackageManagement).Count | Should BeExactly 2
@@ -51,14 +73,14 @@ Describe "Get-LatestModuleVersion" {
     }
 
     Context 'Output' {
-        It "Result_ShouldBe_$latestVersion" {
-            Get-LatestModuleVersion -Name Pester | should be $latestVersion
-        }
         It 'Result_ShouldBe_Array' {
             (Get-LatestModuleVersion -Name Pester,PackageManagement) -is [System.Array]| Should be $true
         }
-        It "Result[0]_ShouldBe_$latestVersion" {
-            (Get-LatestModuleVersion -Name Pester,PackageManagement)[0] | should be $latestVersion
+        It "Result_ShouldBe_4.0.8" {
+            Get-LatestModuleVersion -Name Pester | should be '4.0.8'
+        }
+        It "Result[1]_ShouldBe_1.0.0.1" {
+            (Get-LatestModuleVersion -Name Pester,PackageManagement)[1] | should be '1.0.0.1'            
         }
     }
 }
