@@ -33,7 +33,7 @@ Describe "Get-LatestModuleVersion" {
             [PSCustomObject]@{
                 ModuleType = 'Manifest'
                 Version = '3.2.0.0'
-                Name = 'Pester'
+                Name = 'xNetworking'
                 ExportedCommands = {'Convert-CIDRToSubhetMask','Test-IsNanoServer'}
             }
         } -ParameterFilter {$Name -eq 'xNetworking'}

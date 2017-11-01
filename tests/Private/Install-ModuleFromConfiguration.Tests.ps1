@@ -6,142 +6,292 @@ $here = $here -replace 'tests', 'InvokeDSC'
 . "$here\$sut"
 . "$here\Get-ModuleFromConfiguration.ps1"
 
-Describe "Install-ModuleFromConfiguration Specified Module Version" {
+Describe 'Install-ModuleFromConfiguration' {
 
     BeforeAll {
-    $singleModuleVersion = @"
+        Function Get-Module {
+            param()
+            throw 'Fake Get-Module cmdlet'
+        }
+
+        Function Find-Module {
+            param()
+            throw 'Fake Find-Module cmdlet'
+        }
+
+        Function Install-Module {
+            param()
+            throw 'Fake Install-Module cmdlet'
+        }          
+    }
+
+    Context 'NoModules_Should_WriteVerboseMessage' {
+        $NoModules = @"
+{
+    "DSCResourcesToExecute":{
+    }
+}
+"@
+
+    Mock Write-Verbose {} -Verifiable -ParameterFilter { $Message -eq 'No Modules declared in configuration...'}
+
+        It 'mocking write-verbose' {
+            Install-ModuleFromConfiguration -InputObject $noModules
+            Assert-MockCalled Write-Verbose -Times 1 -Exactly
+        }
+    }
+
+    Context 'NoModuleVersion_ModuleExists' {        
+
+        Mock Get-ModuleFromConfiguration {
+            [PSCustomObject]@{
+                Name = 'xPSDesiredStateConfiguration'
+                Value = $null
+            }
+        }
+
+        Mock Get-Module {
+            [PSCustomObject]@{
+                ModuleType = 'Script'
+                Version = '7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+            }
+        } -Verifiable
+
+        Mock Find-Module {
+            [PSCustomObject]@{
+                Version = [version]'7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+                Repository = 'PSGallery'
+            }
+        }
+
+        Mock Install-Module {
+
+        }
+
+        $singleModuleVersion = @"
+{
+    "Modules":{
+        "xPSDesiredStateConfiguration":null
+    },
+    "DSCResourcesToExecute":{
+    }
+}
+"@
+
+        It 'Install-Module_Should_Not_Be_Called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Install-Module -Times 0 -Exactly
+        }
+        It 'Find-Module_Should_Not_Be_called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+        }
+        It 'Get-Module_Mock_Verifiable' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-VerifiableMocks
+        }
+
+    }
+
+    Context 'ModuleVersion_ModuleExists' {       
+
+        Mock Get-ModuleFromConfiguration {
+            [PSCustomObject]@{
+                Name = 'xPSDesiredStateConfiguration'
+                Value = '7.0.0.0'
+            }
+        }
+
+        Mock Get-Module {
+            [PSCustomObject]@{
+                ModuleType = 'Script'
+                Version = '7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+            }
+        } -Verifiable
+
+        Mock Find-Module {
+            [PSCustomObject]@{
+                Version = [version]'7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+                Repository = 'PSGallery'
+            }
+        }
+
+        Mock Install-Module {
+
+        }
+
+        $singleModuleVersion = @"
 {
     "Modules":{
         "xPSDesiredStateConfiguration":"6.0.0.0"     
     },
-   "DSCResourcesToExecute":{
-   }
-}
-"@
-
-    New-Item -Path 'testdrive:\singleModuleVersion.json' -Value $singleModuleVersion -ItemType File
-    
-    if (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable){
-        (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable).modulebase | % {Remove-Item -Path $_ -Recurse -Force}
-    }
-
-    Set-PackageSource -Name PSGallery -Trusted -Force
-}
-
-    It 'Install-ModuleFromConfiguration cmdlet exists' {
-        Get-Command -Name Install-ModuleFromConfiguration | should not BeNullOrEmpty
-    }
-    
-    Context 'Specified Module Version' {
-
-        Install-ModuleFromConfiguration -Path 'testdrive:\singleModuleVersion.json'
-        
-        It 'Module should exist' {
-            (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable) | Should not BeNullOrEmpty
-        }
-
-        It 'Module Version should match' {
-            (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable).Version | should match '6.0.0.0'
-
-        }
-
+    "DSCResourcesToExecute":{
     }
 }
+"@        
 
-Describe 'Install-ModuleFromConfiguration No Specified Module Version' {
-    BeforeAll {
-        $NoModuleVersion = 
-@"
-    {
-        "Modules":{
-            "xPSDesiredStateConfiguration":null
-        },
-       "DSCResourcesToExecute":{
-       }
-    }
-"@
-    
-        New-Item -Path 'testdrive:\NoModuleVersion.json' -Value $NoModuleVersion -ItemType File
-        
-        if (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable){
-            (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable).modulebase | % {Remove-Item -Path $_ -Recurse -Force}
+        It 'Install-Module_Should_Not_Be_Called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Install-Module -Times 0 -Exactly
         }
-    
-        Set-PackageSource -Name PSGallery -Trusted -Force
-    }
-
-    Context 'No Specified Module Version' {
-        
-        Install-ModuleFromConfiguration -Path 'testdrive:\NoModuleVersion.json'
-        
-        It 'Module should exist' {
-            (Get-Module -Name xPSDesiredStateConfiguration -ListAvailable) | Should not BeNullOrEmpty
+        It 'Find-Module_Should_Not_Be_called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
         }
-    }    
-}
+        It 'Get-Module_Mock_Verifiable' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-VerifiableMocks
+        }
+    }
+   Context 'ModuleVersion_ModuleExists' {          
 
-Describe 'No Modules' {
-    BeforeAll {
-        $noModules = @"
-        {
-            "DSCResourcesToExecute":{
-                "NewFile":{
-                    "dscResourceName":"File",
-                    "destinationPath":"c:\\archtype\\file.txt",
-                    "type":"File",
-                    "contents":"Test",
-                    "attributes":["hidden","archive"],
-                    "ensure":"Present",
-                    "force":true
-                }
+        Mock Get-ModuleFromConfiguration {
+            [PSCustomObject]@{
+                Name = 'xPSDesiredStateConfiguration'
+                Value = '7.0.0.0'
             }
         }
-"@
 
-        New-Item -Path 'testdrive:\noModules.json' -Value $noModules -ItemType File
-    }
+        Mock Get-Module {
+            [PSCustomObject]@{
+                ModuleType = 'Script'
+                Version = '7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+            }
+        } -Verifiable
 
-    it 'Find-Module should be called 0 times' {
-        mock -CommandName Find-Module -MockWith {}
-        $null = Install-ModuleFromConfiguration -Path 'testdrive:\noModules.json'
-        Assert-MockCalled -CommandName Find-Module -Times 0
-    }
-}
+        Mock Find-Module {
+            [PSCustomObject]@{
+                Version = [version]'7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+                Repository = 'PSGallery'
+            }
+        }
 
-Describe "ReturnShouldNotBeCalled" {
-    Context 'Will it work?' {
-$config = @"
+        Mock Install-Module {
+
+        }
+
+        $singleModuleVersion = @"
 {
     "Modules":{
-        "cChoco":null,
-        "PackageManagement":"1.1.6.0",
-        "PackageManagementProviderResource":null
+        "xPSDesiredStateConfiguration":"6.0.0.0"     
     },
-"DSCResourcesToExecute":{
-        "RegisterPowerShellFeed":{
-            "dscResourceName":"PackageManagementSource",
-            "name":"Internal",
-            "SourceUri":"https://artifact.paylocity.com/artifactory/api/nuget/powershell",
-            "providerName":"PowerShellGet",
-            "InstallationPolicy":"Trusted",
-            "ensure":"Present"
-        },
-        "chocoSource":{
-        "dscResourceName":"cChocoSource",
-            "Name":"PCTYchoco",
-            "Priority":0,
-            "source":"https://artifact.paylocity.com/artifactory/api/nuget/chocolatey-local"
-        }     
+    "DSCResourcesToExecute":{
     }
 }
-"@
-Mock Write-Verbose {} -Verifiable -ParameterFilter { $Message -eq 'No Modules declared in configuration...'}
-        It 'should not call return' {
-           {Install-ModuleFromConfiguration -InputObject $config} | should not throw
+"@        
+
+        It 'Install-Module_Should_Not_Be_Called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Install-Module -Times 0 -Exactly
+        }
+        It 'Find-Module_Should_Not_Be_called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+        }
+        It 'Get-Module_Mock_Verifiable' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-VerifiableMocks
+        }
+    }
+
+    Context 'ModuleVersion_ModuleNotExists' {            
+    
+            Mock Get-ModuleFromConfiguration {
+                [PSCustomObject]@{
+                    Name = 'xPSDesiredStateConfiguration'
+                    Value = '7.0.0.0'
+                }
+            }
+    
+            Mock Get-Module {} -Verifiable
+    
+            Mock Find-Module {
+                [PSCustomObject]@{
+                    Version = [version]'7.0.0.0'
+                    Name = 'xPSDesiredStateConfiguration'
+                    Repository = 'PSGallery'
+                }
+            }
+    
+            Mock Install-Module {
+    
+            }
+    
+            $singleModuleVersion = @"
+{
+"Modules":{
+    "xPSDesiredStateConfiguration":"6.0.0.0"     
+},
+"DSCResourcesToExecute":{
+}
+}
+"@        
+    
+        It 'Install-Module_Should_Not_Be_Called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Install-Module -Times 1 -Exactly
+        }
+        It 'Find-Module_Should_Not_Be_called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+        }
+        It 'Get-Module_Mock_Verifiable' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-VerifiableMocks
+        }
+    }
+    
+    Context 'ModuleVersion_ModuleNotExists' {                  
+
+        Mock Get-ModuleFromConfiguration {
+            [PSCustomObject]@{
+                Name = 'xPSDesiredStateConfiguration'
+                Value = $null
+            }
+        }
+        
+        Mock Get-Module {} -Verifiable
+
+        Mock Find-Module {
+            [PSCustomObject]@{
+                Version = [version]'7.0.0.0'
+                Name = 'xPSDesiredStateConfiguration'
+                Repository = 'PSGallery'
+            }
         }
 
-        It 'mocking write-verbose' {
-            Assert-MockCalled Write-Verbose -Times 0 -Exactly
+        Mock Install-Module {
+
         }
-    } 
+
+        $singleModuleVersion = @"
+    {
+"Modules":{
+    "xPSDesiredStateConfiguration":null    
+},
+"DSCResourcesToExecute":{
+}
+}
+"@        
+        
+        It 'Install-Module_Should_Not_Be_Called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-MockCalled -CommandName Install-Module -Times 1 -Exactly
+        }
+        It 'Find-Module_Should_Not_Be_called' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            #Called twice because of stubbing
+            Assert-MockCalled -CommandName Find-Module -Times 2 -Exactly            
+        }
+        It 'Get-Module_Mock_Verifiable' {
+            Install-ModuleFromConfiguration -InputObject $singleModuleVersion
+            Assert-VerifiableMocks
+        }
+    }     
 }
