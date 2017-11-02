@@ -64,6 +64,7 @@ function ConvertTo-Dsc {
             $configkeys = ($dscResource.psobject.Properties -notmatch '(dsc)?ResourceName')
             foreach ($configKey in $configKeys) {
                 $prop = $resource.Properties | Where-Object {$_.Name -eq $configKey.Name}
+                
                 if ($ConfigKey.Value -is [array]) {
                     foreach ($key in $ConfigKey.Value) {
                         if ($key.psobject.Properties['CimType']) {
@@ -85,6 +86,13 @@ function ConvertTo-Dsc {
                     }
                     $config.Property.Add($configKey.Name, $value)
                     Remove-Variable -Name Value -Force
+                }
+                elseif ($prop.PropertyType -eq '[PSCredential]') {
+                    $credSplit = $configKey.Value -split '\\'
+                    $cred = New-Object System.Management.Automation.PSCredential ($credSplit[0], ($credSplit[1] | ConvertTo-SecureString -AsPlainText -Force))
+                    [System.Management.Automation.PSCredential]$value = $cred
+                    $config.Property.Add($configKey.Name, $value)
+                    Remove-Variable -Name Value -Force                    
                 }
                 else {
                     $config.Property.Add($configKey.Name, $configKey.Value)
@@ -111,5 +119,3 @@ function ConvertTo-Dsc {
         return $alldscObj
     }
 }
-#$test = ConvertTo-DSC -Path $PSScriptRoot\..\..\examples\xwebsite.json
-#$test = ConvertTo-DSC -InputObject (Get-Content $PSScriptRoot\..\..\examples\xwebsite.json)

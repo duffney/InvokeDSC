@@ -302,3 +302,33 @@ $xWebSiteJson = @"
         }
     }
 }
+
+Describe 'Converting PSCredential Object Tests' {
+    BeforeAll {
+        $credConfig = @"
+{
+    "Modules":{
+        "xSQLServer":null
+    },
+    "DSCResourcesToExecute":{
+        "CreateLogin":{
+        "dscResourceName":"xSQLServerLogin",
+        "Name":"SQLLoginUserName",
+        "SQLServer":"SQLServer01",
+        "SQLInstanceName":"MSSQLSERVER",
+        "LoginCredential":"UserName\\Password"
+        }
+    }
+}      
+"@
+    }
+
+    $result = ConvertTo-Dsc -InputObject $credConfig
+
+    it 'Property.LoginCredential should be type PSCredential' {
+        ($result.Property.LoginCredential).GetType().Name | should be 'PSCredential'
+    }
+    it 'Property.LoginCredential should be type PSCredential' {
+        ($result.Property.LoginCredential).UserName | should be 'UserName'
+    }
+}
