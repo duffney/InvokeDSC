@@ -1,6 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
+    {
+        "type": "PowerShell",
+        "request": "launch",
+        "name": "PowerShell Pester Tests",
+        "script": "Invoke-Pester",
+        "args": ["-Tag test"],
+        "cwd": "${workspaceRoot}"
+    },
         {
             "type": "PowerShell",
             "request": "launch",

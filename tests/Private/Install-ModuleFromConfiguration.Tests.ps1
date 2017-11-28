@@ -25,7 +25,10 @@ Describe 'Install-ModuleFromConfiguration' {
         }          
     }
 
-    Context 'NoModules_Should_WriteVerboseMessage' {
+    Context 'NoModulesNeeded_Should_WriteVerboseMessage' {
+
+        Mock Write-Verbose {} -Verifiable -ParameterFilter { $Message -eq 'No Modules declared in configuration...'}
+        
         $NoModules = @"
 {
     "DSCResourcesToExecute":{
@@ -33,7 +36,6 @@ Describe 'Install-ModuleFromConfiguration' {
 }
 "@
 
-    Mock Write-Verbose {} -Verifiable -ParameterFilter { $Message -eq 'No Modules declared in configuration...'}
 
         It 'mocking write-verbose' {
             Install-ModuleFromConfiguration -InputObject $noModules
@@ -90,7 +92,7 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
 
     }
@@ -144,24 +146,19 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
     }
-   Context 'ModuleVersion_ModuleExists' {          
+   Context 'ModuleVersion_RequiredModuleDoesNotExist' {          
 
         Mock Get-ModuleFromConfiguration {
             [PSCustomObject]@{
                 Name = 'xPSDesiredStateConfiguration'
-                Value = '7.0.0.0'
+                Value = '6.0.0.0'
             }
         }
 
         Mock Get-Module {
-            [PSCustomObject]@{
-                ModuleType = 'Script'
-                Version = '7.0.0.0'
-                Name = 'xPSDesiredStateConfiguration'
-            }
         } -Verifiable
 
         Mock Find-Module {
@@ -188,7 +185,7 @@ Describe 'Install-ModuleFromConfiguration' {
 
         It 'Install-Module_Should_Not_Be_Called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-MockCalled -CommandName Install-Module -Times 0 -Exactly
+            Assert-MockCalled -CommandName Install-Module -Times 1 -Exactly
         }
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
@@ -196,7 +193,7 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
     }
 
@@ -205,7 +202,7 @@ Describe 'Install-ModuleFromConfiguration' {
             Mock Get-ModuleFromConfiguration {
                 [PSCustomObject]@{
                     Name = 'xPSDesiredStateConfiguration'
-                    Value = '7.0.0.0'
+                    Value = $null
                 }
             }
     
@@ -226,7 +223,7 @@ Describe 'Install-ModuleFromConfiguration' {
             $singleModuleVersion = @"
 {
 "Modules":{
-    "xPSDesiredStateConfiguration":"6.0.0.0"     
+    "xPSDesiredStateConfiguration":null     
 },
 "DSCResourcesToExecute":{
 }
@@ -239,11 +236,11 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+            Assert-MockCalled -CommandName Find-Module -Times 2 -Exactly            
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
     }
     
@@ -291,7 +288,7 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
-    }     
+    }
 }

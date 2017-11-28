@@ -5,8 +5,8 @@ function Invoke-Dsc
 Invokes Dsc resources
 
 .DESCRIPTION
-Passes PSCustomObjects to Invoke-DscResource first by invoking the test method and
-if the test method fails invokes the set method.
+Passes PSCustomObjects to Invoke-DscResource by invoking the Test method and
+if the Test method fails invokes the Set method.
 
 .PARAMETER Resource
 Specifies the PSCustomObject to be passed to Invoke-DscResource
