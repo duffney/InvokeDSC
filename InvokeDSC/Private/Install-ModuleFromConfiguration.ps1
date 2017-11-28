@@ -61,10 +61,10 @@ function Install-ModuleFromConfiguration {
             }
             else
             {
-                if (!(Get-Module -FullyQualifiedName @{ModuleName=$module.Name;moduleversion=$module.Value} -ListAvailable)) 
+                if (!(Get-Module -FullyQualifiedName @{ModuleName=$module.Name;RequiredVersion=$module.Value} -ListAvailable)) 
                 {
-                    Write-Verbose -Message "[$($module.Name)] not found with version [$($module.Version)]"
-                    Write-Verbose -Message "Installing [$($module.version)] of [$($module.Name)]"
+                    Write-Verbose -Message "[$($module.Name)] not found with version [$($module.Value)]"
+                    Write-Verbose -Message "Installing [$($module.Value)] of [$($module.Name)]"
                     Install-Module -Name $module.Name -RequiredVersion $module.value -Repository $Repository -Confirm:$false
                 }
                 else
