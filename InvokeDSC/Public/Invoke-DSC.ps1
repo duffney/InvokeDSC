@@ -36,7 +36,6 @@ by running the test method first and if the test method fails it invokes the set
                 $splat = @{
                     Name = $r.dscResourceName
                     Property = $r.Property
-                    #ModuleName = $r.ModuleName
                     ErrorAction = 'SilentlyContinue'
                 }
 

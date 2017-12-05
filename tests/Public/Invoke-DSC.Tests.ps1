@@ -6,106 +6,188 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 $here = $here -replace 'tests', 'InvokeDSC'
 
 . "$here\$sut"
-. "$here\ConvertTo-DSC.ps1"
-. "$here\..\Private\Get-LatestModuleVersion"
 
-Describe "Invoke-Dsc Tests" {
-
-    BeforeAll {
-        $jsonInput = @"
-{
-   "DSCResourcesToExecute":{
-      "NewFile:": {
-          "dscResourceName":"File",
-          "destinationPath":"c:\\archtype\\file.txt",
-          "type":"File",
-          "contents":"Test",
-          "attributes":["hidden","archive"],
-          "ensure":"Present",
-          "force":true
-      }
-   }
-}
-"@
-
-$moduleVersion = @"
-{
-   "Modules":{
-           "xPSDesiredStateConfiguration":"6.4.0.0"
-   },
-  "DSCResourcesToExecute":{
-       "DevOpsGroup":{
-           "dscResourceName":"xGroup",
-           "GroupName":"DevOps",
-           "ensure":"Present"
-       }
-  }
-}
-    
-"@
-        $resource = ConvertTo-DSC -InputObject $jsonInput
-        $moduleVersionResource = ConvertTo-Dsc -InputObject $moduleVersion
-
-        Set-PackageSource -Name PSGallery -Trusted -Force
-        Install-Module -Name xPSDesiredStateConfiguration -Repository PSGallery -RequiredVersion '6.4.0.0' -Force -Confirm:$false
+Describe 'Invoke-Dsc Tests' {
+    function Get-LatestModuleVersion () {
+        
     }
+    Context 'Inputs' {
+        Mock Get-LatestModuleVersion {'8.0.0.0'}
+        Mock ConvertTo-Dsc {
+            [PSCustomObject]@{
+                ResourceName = 'DevOpsGroup'
+                dscResourceName = 'xGroup'
+                ModuleName = 'xPSDesiredStateConfiguration'
+                ModuleVersion = '8.0.0.0'
+                Property = @{
+                    ensure = 'Present'
+                    GroupName = 'DevOps'
+                }
+            }
+        }
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Test'}
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}        
 
-    it "command exists" {
-        (Get-Command -Name ($sut -replace '\.ps1')) | should not beNullorEmpty
-    }
-
-    it "run Invoke-DSC" {
-        (Invoke-DSC -Resource $resource) | should not beNullorEmpty
-    }
-
-    it "file.txt should exist" {
-        (Test-Path 'C:\archtype\file.txt') | should be $true
-    }
-
-    it "content should be [test]" {
-        (Get-Content 'C:\archtype\file.txt') | should be 'Test'
-    }
-
-    It "DevOps Group should exist" {
-        Invoke-DSC -Resource $moduleVersionResource
-        (Get-LocalGroup -Name DevOps) | should not beNullorEmpty
-    }
-    
-    #add test for module version not found
-
-    AfterAll {
-        Remove-Item -Path C:\archtype -Recurse -Force
-        Remove-LocalGroup -Name DevOps
-    }
-}
-
-Describe 'InvokeDSC' {
-    
-    Context 'Execution' {
-        # #Install xPSDesiredStateConfiguration Modules 2 versions
-        # Set-PackageSource -Name PSGallery -Trusted -Force
-        # Install-Module -Name xPSDesiredStateConfiguration -Repository PSGallery -RequiredVersion '6.4.0.0' -Force -Confirm:$false
-        # Install-Module -Name xPSDesiredStateConfiguration -Repository PSGallery -RequiredVersion '7.0.0.0' -Force -Confirm:$false
-
-$config = @"
+        $config = @"
 {
     "Modules":{
-            "xPSDesiredStateConfiguration":null
+            "xPSDesiredStateConfiguration":'8.0.0.0'
     },
     "DSCResourcesToExecute":{
         "DevOpsGroup":{
             "dscResourceName":"xGroup",
-            "GroupName":"Administrators",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
+    }
+}
+"@        
+
+        It 'ShouldProcess -Whatif' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            Invoke-Dsc -Resource $resource -WhatIf
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
+            Assert-MockCalled Invoke-DscResource -Times 0 -ParameterFilter {$Method -eq 'Set'}
+        }
+        It 'Should_Invoke_Set_Method' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            Invoke-Dsc -Resource $resource
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Set'}            
+        }
+        It 'ModuleVersionInConfig_Should_Not_Call_Get-LatestModuleVersion' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            Invoke-Dsc -Resource $resource
+            Assert-MockCalled Get-LatestModuleVersion -Times 0            
+        }
+        It 'ModuleVersionNull_Should_Call_Get-LatestModuleVersion' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            $resource.ModuleVersion = $null
+            Invoke-Dsc -Resource $resource
+            Assert-MockCalled Get-LatestModuleVersion -Times 1
+        }
+    }
+    Context 'Execute_TestMethod_Pass' {
+
+        Mock Get-LatestModuleVersion {'8.0.0.0'}
+        Mock ConvertTo-Dsc {
+            [PSCustomObject]@{
+                ResourceName = 'DevOpsGroup'
+                dscResourceName = 'xGroup'
+                ModuleName = 'xPSDesiredStateConfiguration'
+                ModuleVersion = '8.0.0.0'
+                Property = @{
+                    ensure = 'Present'
+                    GroupName = 'DevOps'
+                }
+            }
+        }
+        Mock Invoke-DscResource {
+            [PSCustomObject]@{
+                InDesiredState = $true
+            }
+        } -ParameterFilter {$Method -eq 'Test'}
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}        
+
+        $config = @"
+{
+    "Modules":{
+            "xPSDesiredStateConfiguration":'8.0.0.0'
+    },
+    "DSCResourcesToExecute":{
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
             "ensure":"Present"
         }
     }
 }
 "@
-
-        $resource = ConvertTo-DSC -InputObject $config
-        
-        It 'ModuleVersionNull_UseLatestVersion_ShouldNot_Throw' {
-            {Invoke-Dsc -Resource $resource} | Should Not throw
+        It 'TestMethod_Pass_Should_Not_Invoke_Set' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            Invoke-Dsc -Resource $resource
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
+            Assert-MockCalled Invoke-DscResource -Times 0 -ParameterFilter {$Method -eq 'Set'}              
         }
     }
+    Context 'Execute_TestMethod_Fail' {
+        
+        Mock Get-LatestModuleVersion {'8.0.0.0'}
+        Mock ConvertTo-Dsc {
+            [PSCustomObject]@{
+                ResourceName = 'DevOpsGroup'
+                dscResourceName = 'xGroup'
+                ModuleName = 'xPSDesiredStateConfiguration'
+                ModuleVersion = '8.0.0.0'
+                Property = @{
+                    ensure = 'Present'
+                    GroupName = 'DevOps'
+                }
+            }
+        }
+        Mock Invoke-DscResource {
+            [PSCustomObject]@{
+                InDesiredState = $false
+            }
+        } -ParameterFilter {$Method -eq 'Test'}
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}        
+
+        $config = @"
+{
+    "Modules":{
+            "xPSDesiredStateConfiguration":'8.0.0.0'
+    },
+    "DSCResourcesToExecute":{
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
+    }
+}
+"@
+        It 'TestMethod_Fail_Should_Invoke_Set' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            Invoke-Dsc -Resource $resource
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Set'}              
+        }
+    }
+    Context 'Execute_ResourceNotFound_Error' {
+        
+        Mock Get-LatestModuleVersion {'8.0.0.0'}
+        Mock ConvertTo-Dsc {
+            [PSCustomObject]@{
+                ResourceName = 'DevOpsGroup'
+                dscResourceName = 'xGroup'
+                ModuleName = 'xPSDesiredStateConfiguration'
+                ModuleVersion = '8.0.0.0'
+                Property = @{
+                    ensure = 'Present'
+                    GroupName = 'DevOps'
+                }
+            }
+        }
+        Mock Invoke-DscResource {throw 'Invoke-DscResource : Resource File was not found.'}
+
+        $config = @"
+{
+    "Modules":{
+            "xPSDesiredStateConfiguration":'8.0.0.0'
+    },
+    "DSCResourcesToExecute":{
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
+    }
+}
+"@
+        It 'Resource_Not_Found_Should_Throw' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            {Invoke-Dsc -Resource $resource} | Should -Throw 'Invoke-DscResource : Resource File was not found.'
+
+        }
+    }    
 }
