@@ -18,8 +18,8 @@ Invoke-Dsc -Resource $r
 .NOTES
 Wraps around the native Invoke-DscResource cmdlet and invokes them as native Dsc would
 by running the test method first and if the test method fails it invokes the set method.
-#>    
-    [CmdletBinding()]
+#>
+    [CmdletBinding(SupportsShouldProcess=$True)]
     Param
     (
         [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,Position=0)]
@@ -32,7 +32,7 @@ by running the test method first and if the test method fails it invokes the set
     Process
     {
         foreach ($r in $Resource) {
-              
+
                 $splat = @{
                     Name = $r.dscResourceName
                     Property = $r.Property
@@ -56,22 +56,26 @@ by running the test method first and if the test method fails it invokes the set
                         $splat.Add('ModuleName',@{ModuleName=$($r.ModuleName);ModuleVersion=$latestVersion})
                     }
                 }
-                
-                Write-Output "[Start Test] [[$($r.dscResourceName)]$($r.ResourceName)]"
-                $testResults = Invoke-DscResource @splat -Method Test -ErrorVariable TestError -Verbose:$false
 
-                if ($TestError) {
-                    Write-Error ("Failed to Invoke $($r.resourceName)" + ($TestError[0].Exception.Message))
-                }
+                Write-Output "[Start Test] [[$($r.dscResourceName)]$($r.ResourceName)]"                    
+                $testResults = Invoke-DscResource @splat -Method Test -ErrorVariable TestError -Verbose:$false  
 
-                elseif (($testResults.InDesiredState) -ne $true) {
-                    Write-Output "[Start Set] [[$($r.dscResourceName)]$($r.ResourceName)]"
-                    Invoke-DscResource @splat -Method Set -ErrorVariable SetError -Verbose:$false
-                }
+                if ($PSCmdlet.ShouldProcess("Invoking Set Method")){
+                    
+                    if ($TestError) {
+                        Write-Error ("Failed to Invoke $($r.resourceName)" + ($TestError[0].Exception.Message))
+                    }
+                    elseif (($testResults.InDesiredState) -ne $true) {
+                        Write-Output "[Start Set] [[$($r.dscResourceName)]$($r.ResourceName)]"
+                        Invoke-DscResource @splat -Method Set -ErrorVariable SetError -Verbose:$false
+                    }
+    
+                    if ($SetError) {
+                        Write-Error "Failed to invoke [$($r.resourceName)] ($SetError[0].Exception.Message)"
+                    }   
 
-                if ($SetError) {
-                    Write-Error "Failed to invoke [$($r.resourceName)] ($SetError[0].Exception.Message)"
-                }
+                } 
+
         }
     }
     End
