@@ -8,9 +8,9 @@ $here = $here -replace 'tests', 'InvokeDSC'
 . "$here\$sut"
 
 Describe 'Invoke-Dsc Tests' {
-    function Get-LatestModuleVersion () {
-        
-    }
+    function Get-LatestModuleVersion () {}
+    function ConvertTo-Dsc () {}
+    
     Context 'Inputs' {
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
