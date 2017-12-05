@@ -1,4 +1,3 @@
-#Requires -RunAsAdministrator
 #Requires -Version 5.0
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
@@ -10,7 +9,7 @@ $here = $here -replace 'tests', 'InvokeDSC'
 Describe 'Invoke-Dsc Tests' {
     function Get-LatestModuleVersion () {}
     function ConvertTo-Dsc () {}
-    
+
     Context 'Inputs' {
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
@@ -26,7 +25,7 @@ Describe 'Invoke-Dsc Tests' {
             }
         }
         Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Test'}
-        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}        
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}
 
         $config = @"
 {
@@ -41,7 +40,7 @@ Describe 'Invoke-Dsc Tests' {
         }
     }
 }
-"@        
+"@
 
         It 'ShouldProcess -Whatif' {
             $resource = ConvertTo-Dsc -InputObject $config
@@ -53,12 +52,12 @@ Describe 'Invoke-Dsc Tests' {
             $resource = ConvertTo-Dsc -InputObject $config
             Invoke-Dsc -Resource $resource
             Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
-            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Set'}            
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Set'}
         }
         It 'ModuleVersionInConfig_Should_Not_Call_Get-LatestModuleVersion' {
             $resource = ConvertTo-Dsc -InputObject $config
             Invoke-Dsc -Resource $resource
-            Assert-MockCalled Get-LatestModuleVersion -Times 0            
+            Assert-MockCalled Get-LatestModuleVersion -Times 0
         }
         It 'ModuleVersionNull_Should_Call_Get-LatestModuleVersion' {
             $resource = ConvertTo-Dsc -InputObject $config
@@ -87,7 +86,7 @@ Describe 'Invoke-Dsc Tests' {
                 InDesiredState = $true
             }
         } -ParameterFilter {$Method -eq 'Test'}
-        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}        
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}
 
         $config = @"
 {
@@ -107,11 +106,11 @@ Describe 'Invoke-Dsc Tests' {
             $resource = ConvertTo-Dsc -InputObject $config
             Invoke-Dsc -Resource $resource
             Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
-            Assert-MockCalled Invoke-DscResource -Times 0 -ParameterFilter {$Method -eq 'Set'}              
+            Assert-MockCalled Invoke-DscResource -Times 0 -ParameterFilter {$Method -eq 'Set'}
         }
     }
     Context 'Execute_TestMethod_Fail' {
-        
+
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
             [PSCustomObject]@{
@@ -130,7 +129,7 @@ Describe 'Invoke-Dsc Tests' {
                 InDesiredState = $false
             }
         } -ParameterFilter {$Method -eq 'Test'}
-        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}        
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}
 
         $config = @"
 {
@@ -150,11 +149,11 @@ Describe 'Invoke-Dsc Tests' {
             $resource = ConvertTo-Dsc -InputObject $config
             Invoke-Dsc -Resource $resource
             Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Test'}
-            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Set'}              
+            Assert-MockCalled Invoke-DscResource -Times 1 -ParameterFilter {$Method -eq 'Set'}
         }
     }
     Context 'Execute_ResourceNotFound_Error' {
-        
+
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
             [PSCustomObject]@{
@@ -189,5 +188,5 @@ Describe 'Invoke-Dsc Tests' {
             {Invoke-Dsc -Resource $resource} | Should -Throw 'Invoke-DscResource : Resource File was not found.'
 
         }
-    }    
+    }
 }

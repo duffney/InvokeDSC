@@ -6,42 +6,93 @@ InvokeDSC is a JSON based DSL for creating and managing infrastructure with DSC 
 ## Overview
 Allows you to declaratively define your infrastructure within JSON configuration documents. InvokeDSC converts those json documents to PSCustomObjects that Invoke-DSCResource can consume. By doing this it removes the need for PowerShell configuration documents and the .mof documents it generates. Which results in more flexibility and removes the need of a single .mof document that declares the end state of your infrastructure.
 
-## Example: New File
 
-### JSON Configuration File
+![test run output](doc/readme/InvokeDSC.jpg)
+
+
+
+## JSON Configuration File
 
 ```JSON
 {
+    "Modules":{
+        "xPSDesiredStateConfiguration":"8.0.0.0"
+    },
    "DSCResourcesToExecute":{
-      "NewFile":{
-          "dscResourceName":"File",
-          "destinationPath":"c:\\DevOps\\Service\\file.txt",
-          "type":"File",
-          "contents":"Test",
-          "attributes":["hidden","archive"],
-          "ensure":"Present",
-          "force":true
-      }
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
    }
 }
 ```
 
-### ConvertTo-DSC PSCustomObject
+## Commands
+
+* ConvertTo-Dsc
+* Invoke-Dsc
+* Invoke-DscConfiguration
+
+## Examples
+
+
+### Invoke-DscConfiguration
 
 ```PowerShell
-$Resource = ConvertTo-DSC -Path 'C:\DSC\NewFile.json'
+Invoke-DscConfiguration -Path 'c:\config.json'
 ```
 
-### Invoke-DSC
-
 ```PowerShell
-Invoke-DSC -Resource $Resource -Verbose
+$config = @"
+{
+    "Modules":{
+        "xPSDesiredStateConfiguration":"8.0.0.0"
+    },
+   "DSCResourcesToExecute":{
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
+   }
+}
+"@
+
+Invoke-DscConfiguration -InputObject $config
 ```
 
-###
+
+### ConvertTo-Dsc
 
 ```PowerShell
-Invoke-DscConfiguration -Path 'C:\DSC\NewFile.json'
+ConvertTo-Dsc -Path 'c:\json\example.json'
+```
+
+```PowerShell
+$config = @"
+{
+    "Modules":{
+        "xPSDesiredStateConfiguration":"8.0.0.0"
+    },
+   "DSCResourcesToExecute":{
+        "DevOpsGroup":{
+            "dscResourceName":"xGroup",
+            "GroupName":"DevOps",
+            "ensure":"Present"
+        }
+   }
+}
+"@
+
+ConvertTo-Dsc -InputObject $config
+```
+
+### Invoke-Dsc
+
+```powershell
+$r = ConvertTo-Dsc -Path 'c:\config.json'
+Invoke-Dsc -Resource $r
 ```
 
 
