@@ -34,7 +34,7 @@ Describe "Function Loaded" {
               "DestinationPath":"c:\\archtype",
               "Type":"Directory",
               "ensure":"Present"
-           },         
+           },
            "archtypeSite":{
               "dscResourceName":"xWebsite",
               "name":"archtype",
@@ -127,10 +127,10 @@ Describe "Function Loaded" {
     New-Item -Path 'testdrive:\xWebSite.json' -Value $xWebSiteJson -ItemType File
     New-Item -Path 'testdrive:\xWebApplication.json' -Value $xWebApplication -ItemType File
     New-Item -Path 'testdrive:\moduleVersion.json' -Value $moduleVersion -ItemType File
-}    
+}
 
     Context "Parameter Tests" {
-        
+
         $result = ConvertTo-DSC -InputObject (Get-Content -Path "testdrive:\xWebSite.json")
 
         It "InputObject results should not BeNullorEmpty" {
@@ -236,7 +236,7 @@ Describe 'Module Version Tests' {
             }
        }
     }
-         
+
 "@
 $xWebSiteJson = @"
 {
@@ -249,7 +249,7 @@ $xWebSiteJson = @"
           "DestinationPath":"c:\\archtype",
           "Type":"Directory",
           "ensure":"Present"
-       },         
+       },
        "archtypeSite":{
           "dscResourceName":"xWebsite",
           "name":"archtype",
@@ -319,7 +319,7 @@ Describe 'Converting PSCredential Object Tests' {
         "LoginCredential":"UserName\\Password"
         }
     }
-}      
+}
 "@
     }
 
@@ -330,5 +330,29 @@ Describe 'Converting PSCredential Object Tests' {
     }
     it 'Property.LoginCredential should be type PSCredential' {
         ($result.Property.LoginCredential).UserName | should be 'UserName'
+    }
+}
+
+Describe 'ConvertTo-DSC Invalid Configurations'  {
+    Context 'Invalid dscResourceName' {
+        $config = @"
+        {
+            "Modules":{
+                "xSQLServer":null
+            },
+            "DSCResourcesToExecute":{
+                "CreateLogin":{
+                "Name":"SQLLoginUserName",
+                "SQLServer":"SQLServer01",
+                "SQLInstanceName":"MSSQLSERVER",
+                "LoginCredential":"UserName\\Password"
+                }
+            }
+        }
+"@
+
+        It 'Should_Throw_dscResourceNameisNull' {
+            {ConvertTo-Dsc -InputObject $config} | Should -Throw
+        }
     }
 }

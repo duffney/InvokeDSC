@@ -21,34 +21,39 @@ function ConvertTo-Dsc {
         [object[]]$InputObject
     )
     begin {
-        
+
         if ($PSBoundParameters.ContainsKey('Path')) {
             $data = Get-Content -Path $path -Raw | ConvertFrom-Json
         }
         else {
             $data = $InputObject | ConvertFrom-Json
         }
-        
+
         $alldscObj = @()
     }
     process {
-        $dscResourceProperties = $data.DSCResourcesToExecute.PSObject.Properties | 
+        $dscResourceProperties = $data.DSCResourcesToExecute.PSObject.Properties |
             Where-Object { $_.MemberType -eq "NoteProperty"; };
         foreach ($dscResourceProperty in $dscResourceProperties) {
             $dscResource = $dscResourceProperty.Value
             $dscObj = New-Object psobject
-            $resource = (Get-DscResource -Name $dscResource.dscResourceName | Sort-Object Version -Descending)[0]
-            
+
+            if ($dscResource.dscResourceName) {
+                $resource = (Get-DscResource -Name $dscResource.dscResourceName | Sort-Object Version -Descending)[0]
+            } else {
+                throw "dscResourceName property is null for [$($dscResourceProperty.Name)]"
+            }
+
             if ($dscResource.dscResourceName -eq 'file') {
                 $module = 'PSDesiredStateConfiguration'
             } else {
-                $module = $resource.ModuleName                
+                $module = $resource.ModuleName
             }
-            
+
             if ($null -ne $data.Modules.$module -and $data.Modules -match $module)
             {
                 $moduleVersion = ($data.Modules).$module
-                
+
                 if ($resource.Version -notmatch $moduleVersion)
                 {
                     $resource = Get-DscResource -Name $dscResource.dscResourceName | Where-Object Version -Match $moduleVersion
@@ -64,7 +69,7 @@ function ConvertTo-Dsc {
             $configkeys = ($dscResource.psobject.Properties -notmatch '(dsc)?ResourceName')
             foreach ($configKey in $configKeys) {
                 $prop = $resource.Properties | Where-Object {$_.Name -eq $configKey.Name}
-                
+
                 if ($ConfigKey.Value -is [array]) {
                     foreach ($key in $ConfigKey.Value) {
                         if ($key.psobject.Properties['CimType']) {
@@ -92,7 +97,7 @@ function ConvertTo-Dsc {
                     $cred = New-Object System.Management.Automation.PSCredential ($credSplit[0], ($credSplit[1] | ConvertTo-SecureString -AsPlainText -Force))
                     [System.Management.Automation.PSCredential]$value = $cred
                     $config.Property.Add($configKey.Name, $value)
-                    Remove-Variable -Name Value -Force                    
+                    Remove-Variable -Name Value -Force
                 }
                 else {
                     $config.Property.Add($configKey.Name, $configKey.Value)
