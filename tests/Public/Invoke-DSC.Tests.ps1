@@ -11,6 +11,7 @@ Describe 'Invoke-Dsc Tests' {
     function ConvertTo-Dsc () {}
 
     Context 'Inputs' {
+        Mock Get-DscLocalConfigurationManager {'Idle'}
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
             [PSCustomObject]@{
@@ -65,9 +66,15 @@ Describe 'Invoke-Dsc Tests' {
             Invoke-Dsc -Resource $resource
             Assert-MockCalled Get-LatestModuleVersion -Times 1
         }
+        It 'LCMState_Idle_AssertMock_Get-DSCLocalConfigurationManager_1_Time' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            Invoke-Dsc -Resource $resource
+            Assert-MockCalled Get-DscLocalConfigurationManager -Times 1
+        }
     }
     Context 'Execute_TestMethod_Pass' {
 
+        Mock Get-DscLocalConfigurationManager {'Idle'}
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
             [PSCustomObject]@{
@@ -110,7 +117,7 @@ Describe 'Invoke-Dsc Tests' {
         }
     }
     Context 'Execute_TestMethod_Fail' {
-
+        Mock Get-DscLocalConfigurationManager {'idle'}
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
             [PSCustomObject]@{
@@ -153,7 +160,7 @@ Describe 'Invoke-Dsc Tests' {
         }
     }
     Context 'Execute_ResourceNotFound_Error' {
-
+        Mock Get-DscLocalConfigurationManager {'idle'}
         Mock Get-LatestModuleVersion {'8.0.0.0'}
         Mock ConvertTo-Dsc {
             [PSCustomObject]@{
@@ -187,6 +194,34 @@ Describe 'Invoke-Dsc Tests' {
             $resource = ConvertTo-Dsc -InputObject $config
             {Invoke-Dsc -Resource $resource} | Should -Throw 'Invoke-DscResource : Resource File was not found.'
 
+        }
+    }
+
+    Context 'Execute_LCM_Busy' {
+        Mock Get-DscLocalConfigurationManager {
+            [PSCustomObject]@{
+                LCMState = 'Busy'
+            }
+        }
+        Mock Get-LatestModuleVersion {'8.0.0.0'}
+        Mock ConvertTo-Dsc {
+            [PSCustomObject]@{
+                ResourceName = 'DevOpsGroup'
+                dscResourceName = 'xGroup'
+                ModuleName = 'xPSDesiredStateConfiguration'
+                ModuleVersion = '8.0.0.0'
+                Property = @{
+                    ensure = 'Present'
+                    GroupName = 'DevOps'
+                }
+            }
+        }
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Test'}
+        Mock Invoke-DscResource {} -ParameterFilter {$Method -eq 'Set'}
+
+        It 'LCMState_Busy_AssertMock_Get-DSCLocalConfigurationManager_5_Time_Should_Throw' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            {Invoke-Dsc -Resource $resource -Retry 5 -Delay 1 -WarningAction SilentlyContinue} | Should -Throw
         }
     }
 }
