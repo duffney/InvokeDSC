@@ -70,6 +70,9 @@ function ConvertTo-Dsc {
             foreach ($configKey in $configKeys) {
                 $prop = $resource.Properties | Where-Object {$_.Name -eq $configKey.Name}
 
+                if ($ConfigKey.Value -is [array] -and $prop.PropertyType -eq '[string]'){
+                    $ConfigKey.Value = $configKey.Value | Out-String
+                }
                 if ($ConfigKey.Value -is [array]) {
                     foreach ($key in $ConfigKey.Value) {
                         if ($key.psobject.Properties['CimType']) {

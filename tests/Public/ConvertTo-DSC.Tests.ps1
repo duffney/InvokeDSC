@@ -356,3 +356,31 @@ Describe 'ConvertTo-DSC Invalid Configurations'  {
         }
     }
 }
+
+Describe 'Dynamic Array to String' {
+    Context 'xScript String Array to String' {
+        $config = @"
+{
+    "Modules":{
+        "xSQLServer":null
+    },
+    "DSCResourcesToExecute":{
+        "StringArray":{
+            "dscResourceName":"xScript",
+            "SetScript":[
+                "itemOne",
+                "itemTwo",
+                "itemThree"
+            ],
+            "TestScript":"`$false",
+            "GetScript":"{ @{ Result = () } } "
+        }
+    }
+}
+"@
+        It 'Should_BeOfType_String' {
+            $resource = ConvertTo-Dsc -InputObject $config
+            $resource.Property.SetScript | Should -BeOfType 'string'
+        }
+    }
+}
