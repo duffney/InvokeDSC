@@ -35,6 +35,8 @@ by running the test method first and if the test method fails it invokes the set
 
     Begin
     {
+        $ProgPref = $global:ProgressPreference
+        $global:ProgressPreference = 'SilentlyContinue'
         $retryCount = 0
         if ((Get-DscLocalConfigurationManager).LCMState -eq 'Busy')
         {
@@ -106,5 +108,6 @@ by running the test method first and if the test method fails it invokes the set
     }
     End
     {
+        $global:ProgressPreference = $ProgPref
     }
 }

@@ -39,6 +39,8 @@ function Invoke-DscConfiguration
 
     begin
     {
+        $ProgPref = $global:ProgressPreference
+        $global:ProgressPreference = 'SilentlyContinue'
         if ($PSBoundParameters.ContainsKey('Path'))
         {
             Install-ModuleFromConfiguration -Path $Path -Repository $Repository
@@ -68,6 +70,6 @@ function Invoke-DscConfiguration
 
     end
     {
-
+        $global:ProgressPreference = $ProgPref
     }
 }
