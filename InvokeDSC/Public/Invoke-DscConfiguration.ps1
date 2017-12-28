@@ -34,7 +34,8 @@ function Invoke-DscConfiguration
         [Parameter(Mandatory = $false)]
         [string]$Repository = 'PSGallery',
         [int]$Retry = 5,
-        [int]$Delay = 60
+        [int]$Delay = 60,
+        [switch]$WhatIf
     )
 
     begin
@@ -65,7 +66,15 @@ function Invoke-DscConfiguration
     process
     {
         Write-Verbose -Message "Invoking Dsc resources"
-        Invoke-DSC -Resource $resourceObject -Retry $Retry -Delay $Delay
+        if ($PSBoundParameters.ContainsKey('WhatIf')){
+            Invoke-DSC -Resource $resourceObject -Retry $Retry -Delay $Delay -WhatIf
+        }
+        else
+        {
+            Invoke-DSC -Resource $resourceObject -Retry $Retry -Delay $Delay
+        }
+
+
     }
 
     end
