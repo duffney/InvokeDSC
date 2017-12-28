@@ -4,11 +4,12 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 $here = $here -replace 'tests', 'InvokeDSC'
 
 . "$here\$sut"
-. "$here\Get-ModuleFromConfiguration.ps1"
 
 Describe 'Install-ModuleFromConfiguration' {
 
     BeforeAll {
+        Function Get-ModuleFromConfiguration  {
+        }
         Function Get-Module {
             param()
             throw 'Fake Get-Module cmdlet'
@@ -22,13 +23,13 @@ Describe 'Install-ModuleFromConfiguration' {
         Function Install-Module {
             param()
             throw 'Fake Install-Module cmdlet'
-        }          
+        }
     }
 
     Context 'NoModulesNeeded_Should_WriteVerboseMessage' {
 
         Mock Write-Verbose {} -Verifiable -ParameterFilter { $Message -eq 'No Modules declared in configuration...'}
-        
+
         $NoModules = @"
 {
     "DSCResourcesToExecute":{
@@ -43,7 +44,7 @@ Describe 'Install-ModuleFromConfiguration' {
         }
     }
 
-    Context 'NoModuleVersion_ModuleExists' {        
+    Context 'NoModuleVersion_ModuleExists' {
 
         Mock Get-ModuleFromConfiguration {
             [PSCustomObject]@{
@@ -88,7 +89,7 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
@@ -97,7 +98,7 @@ Describe 'Install-ModuleFromConfiguration' {
 
     }
 
-    Context 'ModuleVersion_ModuleExists' {       
+    Context 'ModuleVersion_ModuleExists' {
 
         Mock Get-ModuleFromConfiguration {
             [PSCustomObject]@{
@@ -129,12 +130,12 @@ Describe 'Install-ModuleFromConfiguration' {
         $singleModuleVersion = @"
 {
     "Modules":{
-        "xPSDesiredStateConfiguration":"6.0.0.0"     
+        "xPSDesiredStateConfiguration":"6.0.0.0"
     },
     "DSCResourcesToExecute":{
     }
 }
-"@        
+"@
 
         It 'Install-Module_Should_Not_Be_Called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
@@ -142,14 +143,14 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
             Assert-VerifiableMock
         }
     }
-   Context 'ModuleVersion_RequiredModuleDoesNotExist' {          
+   Context 'ModuleVersion_RequiredModuleDoesNotExist' {
 
         Mock Get-ModuleFromConfiguration {
             [PSCustomObject]@{
@@ -176,12 +177,12 @@ Describe 'Install-ModuleFromConfiguration' {
         $singleModuleVersion = @"
 {
     "Modules":{
-        "xPSDesiredStateConfiguration":"6.0.0.0"     
+        "xPSDesiredStateConfiguration":"6.0.0.0"
     },
     "DSCResourcesToExecute":{
     }
 }
-"@        
+"@
 
         It 'Install-Module_Should_Not_Be_Called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
@@ -189,7 +190,7 @@ Describe 'Install-ModuleFromConfiguration' {
         }
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly            
+            Assert-MockCalled -CommandName Find-Module -Times 0 -Exactly
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
@@ -197,17 +198,17 @@ Describe 'Install-ModuleFromConfiguration' {
         }
     }
 
-    Context 'ModuleVersion_ModuleNotExists' {            
-    
+    Context 'ModuleVersion_ModuleNotExists' {
+
             Mock Get-ModuleFromConfiguration {
                 [PSCustomObject]@{
                     Name = 'xPSDesiredStateConfiguration'
                     Value = $null
                 }
             }
-    
+
             Mock Get-Module {} -Verifiable
-    
+
             Mock Find-Module {
                 [PSCustomObject]@{
                     Version = [version]'7.0.0.0'
@@ -215,36 +216,36 @@ Describe 'Install-ModuleFromConfiguration' {
                     Repository = 'PSGallery'
                 }
             }
-    
+
             Mock Install-Module {
-    
+
             }
-    
+
             $singleModuleVersion = @"
 {
 "Modules":{
-    "xPSDesiredStateConfiguration":null     
+    "xPSDesiredStateConfiguration":null
 },
 "DSCResourcesToExecute":{
 }
 }
-"@        
-    
+"@
+
         It 'Install-Module_Should_Not_Be_Called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
             Assert-MockCalled -CommandName Install-Module -Times 1 -Exactly
         }
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
-            Assert-MockCalled -CommandName Find-Module -Times 2 -Exactly            
+            Assert-MockCalled -CommandName Find-Module -Times 2 -Exactly
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
             Assert-VerifiableMock
         }
     }
-    
-    Context 'ModuleVersion_ModuleNotExists' {                  
+
+    Context 'ModuleVersion_ModuleNotExists' {
 
         Mock Get-ModuleFromConfiguration {
             [PSCustomObject]@{
@@ -252,7 +253,7 @@ Describe 'Install-ModuleFromConfiguration' {
                 Value = $null
             }
         }
-        
+
         Mock Get-Module {} -Verifiable
 
         Mock Find-Module {
@@ -270,13 +271,13 @@ Describe 'Install-ModuleFromConfiguration' {
         $singleModuleVersion = @"
     {
 "Modules":{
-    "xPSDesiredStateConfiguration":null    
+    "xPSDesiredStateConfiguration":null
 },
 "DSCResourcesToExecute":{
 }
 }
-"@        
-        
+"@
+
         It 'Install-Module_Should_Not_Be_Called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
             Assert-MockCalled -CommandName Install-Module -Times 1 -Exactly
@@ -284,7 +285,7 @@ Describe 'Install-ModuleFromConfiguration' {
         It 'Find-Module_Should_Not_Be_called' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
             #Called twice because of stubbing
-            Assert-MockCalled -CommandName Find-Module -Times 2 -Exactly            
+            Assert-MockCalled -CommandName Find-Module -Times 2 -Exactly
         }
         It 'Get-Module_Mock_Verifiable' {
             Install-ModuleFromConfiguration -InputObject $singleModuleVersion
